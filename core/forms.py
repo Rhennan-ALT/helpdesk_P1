@@ -43,7 +43,7 @@ class ChamadoForm(_BootstrapFormMixin, forms.ModelForm):
             'descricao': forms.Textarea(attrs={'rows': 4}),
         }
 
-class CadastroUsuarioForms(_BootstrapFormMixin, UserCreationForm):
+class CadastroUsuarioForm(_BootstrapFormMixin, UserCreationForm):
     email = forms.EmailField(required=False, label="Email")
 
     class Meta:
