@@ -114,4 +114,6 @@ LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'painel'
 LOGOUT_REDIRECT_URL = 'login'
 
+from django.contrib.messages import constants as messages_constants
+
 
