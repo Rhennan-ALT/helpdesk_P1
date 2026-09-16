@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from .models import SLA, Categoria, Chamado, Equipe, Prioridade
 
@@ -50,3 +50,5 @@ class CadastroUsuarioForm(_BootstrapFormMixin, UserCreationForm):
         model = User
         fields = ["username", "email", "password1", "password2"]
 
+class LoginForm(_BootstrapFormMixin, AuthenticationForm):
+    pass
