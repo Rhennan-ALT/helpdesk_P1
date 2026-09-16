@@ -1,0 +1,69 @@
+{% extends 'core/base.html' %}
+{% block title %}Painel de Chamados{% endblock %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3>Painel de Chamados</h3>
+    <a href="{% url 'chamado_novo' %}" class="btn btn-primary">+ Novo Chamado</a>
+</div>
+
+<form method="get" class="row g-2 mb-3 align-items-end">
+    <div class="col-auto">
+        <label class="form-label mb-0">Status</label>
+        <select name="status" class="form-select" onchange="this.form.submit()">
+            <option value="">Todos</option>
+            {% for valor, rotulo in status_choices %}
+                <option value="{{ valor }}" {% if valor == status_selecionado %}selected{% endif %}>{{ rotulo }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-auto form-check ms-2 mb-2">
+        <input class="form-check-input" type="checkbox" name="atrasados" value="1" id="atrasados"
+               {% if apenas_atrasados %}checked{% endif %} onchange="this.form.submit()">
+        <label class="form-check-label" for="atrasados">Somente atrasados</label>
+    </div>
+</form>
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Título</th>
+            <th>Equipe</th>
+            <th>Prioridade</th>
+            <th>Status</th>
+            <th>Prazo (SLA)</th>
+            <th>Situação</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for chamado in chamados %}
+        <tr>
+            <td><a href="{% url 'chamado_detalhe' chamado.pk %}">#{{ chamado.pk }}</a></td>
+            <td><a href="{% url 'chamado_detalhe' chamado.pk %}">{{ chamado.titulo }}</a></td>
+            <td>{{ chamado.equipe }}</td>
+            <td>{{ chamado.prioridade }}</td>
+            <td>{{ chamado.get_status_display }}</td>
+            <td>
+                {% if chamado.data_limite %}
+                    {{ chamado.data_limite|date:"d/m/Y H:i" }}
+                {% else %}
+                    <span class="text-muted">SLA não cadastrado</span>
+                {% endif %}
+            </td>
+            <td>
+                {% if chamado.status == 'FECHADO' %}
+                    <span class="badge bg-secondary">Concluído</span>
+                {% elif chamado.esta_atrasado %}
+                    <span class="badge badge-atrasado">Atrasado</span>
+                {% else %}
+                    <span class="badge badge-no-prazo">Dentro do prazo</span>
+                {% endif %}
+            </td>
+        </tr>
+    {% empty %}
+        <tr><td colspan="7" class="text-center text-muted py-4">Nenhum chamado encontrado.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
