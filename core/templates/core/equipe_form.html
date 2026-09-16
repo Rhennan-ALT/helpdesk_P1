@@ -1,0 +1,17 @@
+{% extends 'core/base.html' %}
+{% block title %}{% if object %}Editar Equipe{% else %}Nova Equipe{% endif %}{% endblock %}
+{% block content %}
+<h3>{% if object %}Editar Equipe{% else %}Nova Equipe{% endif %}</h3>
+<form method="post" class="form-area mt-3">
+    {% csrf_token %}
+    {% for field in form %}
+        <div class="mb-3">
+            <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}<div class="text-danger small">{{ field.errors }}</div>{% endif %}
+        </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-primary">Salvar</button>
+    <a href="{% url 'equipe_lista' %}" class="btn btn-outline-secondary">Cancelar</a>
+</form>
+{% endblock %}
