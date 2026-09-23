@@ -33,6 +33,8 @@
                {% if apenas_atrasados %}checked{% endif %} onchange="this.form.submit()">
         <label class="form-check-label" for="atrasados">Somente atrasados</label>
     </div>
+
+    <input type="text" name="q" class="form-control" value="{{ busca }}" placeholder="Buscar">
 </form>
 
 <table class="table table-hover">
