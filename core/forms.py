@@ -37,7 +37,7 @@ class ChamadoForm(_BootstrapFormMixin, forms.ModelForm):
         model = Chamado
         fields = [
             'titulo', 'descricao', 'equipe', 'categoria', 'prioridade',
-            'responsavel', 'status',
+            'responsavel', 'status', 'tipo',
         ]
         widgets = {
             'descricao': forms.Textarea(attrs={'rows': 4}),
