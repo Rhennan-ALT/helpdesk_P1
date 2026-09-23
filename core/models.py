@@ -76,6 +76,19 @@ class Chamado(models.Model):
         (STATUS_ANDAMENTO, 'Em Atendimento'),
         (STATUS_FECHADO, 'Concluído'),
     ]
+    
+    TIPO_INCIDENTE = 'INCIDENTE'
+    TIPO_REQUISICAO = 'REQUISICAO'
+    TIPO_DUVIDA = 'DUVIDA'
+    TIPO_CHOICES = [
+        (TIPO_INCIDENTE, 'Incidente'),
+        (TIPO_REQUISICAO, 'Requisição'),
+        (TIPO_DUVIDA, 'Dúvida'),
+    ]
+
+    tipo = models.CharField(
+        'Tipo', max_length=12, choices=TIPO_CHOICES, default=TIPO_INCIDENTE,
+    )
 
     titulo = models.CharField('Título', max_length = 200)
     descricao = models.TextField('Descrição')
