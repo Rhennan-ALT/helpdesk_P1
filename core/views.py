@@ -43,12 +43,18 @@ def painel(request):
     apenas_atrasados = request.GET.get('atrasados') == '1'
     if apenas_atrasados:
         chamados = [c for c in chamados if c.esta_atrasado]
+    
+    tipo_selecionado = request.GET.get('tipo', '')
+    if tipo_selecionado:
+        chamados = chamados.filter(tipo=tipo_selecionado)
 
     contexto = {
         'chamados': chamados,
         'status_choices': Chamado.STATUS_CHOICES,
         'status_selecionado': status_selecionado,
         'apenas_atrasados': apenas_atrasados,
+        'tipo_choices': Chamado.TIPO_CHOICES,
+        'tipo_selecionado': tipo_selecionado,
     }
     return render(request, 'core/painel.html', contexto)
 
