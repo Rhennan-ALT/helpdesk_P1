@@ -47,6 +47,10 @@ def painel(request):
     tipo_selecionado = request.GET.get('tipo', '')
     if tipo_selecionado:
         chamados = chamados.filter(tipo=tipo_selecionado)
+    
+    busca = request.GET.get('q', '').strip()
+    if busca:
+        chamados = chamados.filter(Q(titulo__icontains=busca) | Q(descricao__icontains=busca))
 
     contexto = {
         'chamados': chamados,
@@ -55,6 +59,7 @@ def painel(request):
         'apenas_atrasados': apenas_atrasados,
         'tipo_choices': Chamado.TIPO_CHOICES,
         'tipo_selecionado': tipo_selecionado,
+        'busca': busca,
     }
     return render(request, 'core/painel.html', contexto)
 
