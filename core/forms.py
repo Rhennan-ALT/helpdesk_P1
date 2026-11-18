@@ -31,13 +31,22 @@ class SLAForm(_BootstrapFormMixin, forms.ModelForm):
     class Meta:
         model = SLA
         fields = ["categoria", "prioridade", "horas"]
+    
+    def clean_horas(self):
+        horas = self.cleaned_data.get('horas')
+        if horas is not None and horas < 1:
+            raise forms.ValidationError(
+                'O SLA precisa ter pelo menos 1 hora. Com 0 hora, o prazo '
+                'seria igual à data de abertura do chamado.'
+            )
+        return horas
 
 class ChamadoForm(_BootstrapFormMixin, forms.ModelForm):
     class Meta:
         model = Chamado
         fields = [
             'titulo', 'descricao', 'equipe', 'categoria', 'prioridade',
-            'responsavel', 'status',
+            'responsavel', 'status', 'tipo',
         ]
         widgets = {
             'descricao': forms.Textarea(attrs={'rows': 4}),

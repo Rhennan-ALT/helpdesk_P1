@@ -17,11 +17,24 @@
             {% endfor %}
         </select>
     </div>
+
+    <div class="col-auto">
+        <label class="form-label mb-0">Tipo</label>
+        <select name="tipo" class="form-select" onchange="this.form.submit()">
+            <option value="">Todos</option>
+            {% for valor, rotulo in tipo_choices %}
+                <option value="{{ valor }}" {% if valor == tipo_selecionado %}selected{% endif %}>{{ rotulo }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
     <div class="col-auto form-check ms-2 mb-2">
         <input class="form-check-input" type="checkbox" name="atrasados" value="1" id="atrasados"
                {% if apenas_atrasados %}checked{% endif %} onchange="this.form.submit()">
         <label class="form-check-label" for="atrasados">Somente atrasados</label>
     </div>
+
+    <input type="text" name="q" class="form-control" value="{{ busca }}" placeholder="Buscar">
 </form>
 
 <table class="table table-hover">

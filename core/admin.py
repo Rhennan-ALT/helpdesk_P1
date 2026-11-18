@@ -26,9 +26,9 @@ class SLAAdmin(admin.ModelAdmin):
 class ChamadoAdmin(admin.ModelAdmin):
     list_display = (
         'id', 'titulo', 'status', 'equipe', 'categoria', 'prioridade',
-        'solicitante', 'responsavel', 'data_criacao', 'data_limite', 'esta_atrasado',
+        'solicitante', 'responsavel', 'data_criacao', 'data_limite', 'esta_atrasado','tipo'
     )
-    list_filter = ('status', 'equipe', 'categoria', 'prioridade')
+    list_filter = ('status', 'equipe', 'categoria', 'prioridade', 'tipo')
     search_fields = ('titulo', 'descricao')
     readonly_fields = ('data_criacao', 'data_limite', 'data_fechamento')
 
