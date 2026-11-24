@@ -1,5 +1,6 @@
-from django.db import models
 from django.conf import settings
+from django.core.validators import MinValueValidator
+from django.db import models
 from django.utils import timezone
 
 
@@ -55,6 +56,11 @@ class SLA(models.Model):
     )
     horas = models.PositiveIntegerField(
         'Horas para atendimento', help_text='Prazo limite de resolução.',
+        validators=[MinValueValidator(
+            1,
+            message='O SLA precisa ter pelo menos 1 hora. Com 0 hora, o prazo '
+                    'seria igual à data de abertura do chamado.',
+        )],
     )
 
     class Meta:
@@ -65,6 +71,15 @@ class SLA(models.Model):
 
     def __str__(self):
         return f'{self.categoria} / {self.prioridade} — {self.horas}h'
+
+class ChamadoQuerySet(models.QuerySet):
+
+    def em_aberto(self):
+        return self.exclude(status=Chamado.STATUS_FECHADO)
+
+    def atrasados(self):
+        return self.em_aberto().filter(data_limite__lt=timezone.now())
+
 
 # chamado
 class Chamado(models.Model):
@@ -120,6 +135,8 @@ class Chamado(models.Model):
     )
     data_fechamento = models.DateTimeField('Fechado em', null=True, blank=True, editable=False)
 
+    objects = ChamadoQuerySet.as_manager()
+
     class Meta:
         verbose_name = 'Chamado'
         verbose_name_plural = 'Chamados'
@@ -138,14 +155,28 @@ class Chamado(models.Model):
             return None
         return base + timezone.timedelta(hours=sla.horas)
 
+    def _sla_mudou(self):
+        anterior = (
+            Chamado.objects.filter(pk=self.pk)
+            .values('categoria_id', 'prioridade_id')
+            .first()
+        )
+        if anterior is None:
+            return True
+        return (
+            anterior['categoria_id'] != self.categoria_id
+            or anterior['prioridade_id'] != self.prioridade_id
+        )
+
     def save(self, *args, **kwargs):
         eh_novo = self._state.adding
+        sla_mudou = not eh_novo and self._sla_mudou()
 
         super().save(*args, **kwargs)
 
         atualizar_campos = []
 
-        if eh_novo or self.data_limite is None:
+        if eh_novo or sla_mudou or self.data_limite is None:
             data_limite_calculada = self.calcular_data_limite()
             if data_limite_calculada != self.data_limite:
                 self.data_limite = data_limite_calculada
