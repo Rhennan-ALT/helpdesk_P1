@@ -3,6 +3,7 @@ from rest_framework import generics
 from rest_framework.exceptions import APIException
 
 from .models import SLA, Categoria, Chamado, Equipe, Prioridade
+from .organizacao import org_atual
 from .serializers import (
     CategoriaSerializer, ChamadoSerializer, EquipeSerializer,
     PrioridadeSerializer, SLASerializer,
@@ -24,12 +25,21 @@ class _ExclusaoProtegidaMixin:
             raise ConflitoProtegido()
 
 
+class _DaOrganizacaoMixin:
+
+    def get_queryset(self):
+        return super().get_queryset().filter(organizacao=org_atual(self.request))
+
+    def perform_create(self, serializer):
+        serializer.save(organizacao=org_atual(self.request))
+
+
 class _ChamadoQuerysetMixin:
     """Mesma regra do painel/site: usuário comum só acessa chamados em que é
     solicitante ou responsável; staff acessa todos. Fora disso, 404."""
 
     def get_queryset(self):
-        qs = Chamado.objects.select_related(
+        qs = Chamado.objects.filter(organizacao=org_atual(self.request)).select_related(
             'solicitante', 'responsavel', 'equipe', 'categoria', 'prioridade',
         )
         user = self.request.user
@@ -42,48 +52,48 @@ class ChamadoListCreateAPIView(_ChamadoQuerysetMixin, generics.ListCreateAPIView
     serializer_class = ChamadoSerializer
 
     def perform_create(self, serializer):
-        serializer.save(solicitante=self.request.user)
+        serializer.save(solicitante=self.request.user, organizacao=org_atual(self.request))
 
 
 class ChamadoRetrieveUpdateDestroyAPIView(_ChamadoQuerysetMixin, generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ChamadoSerializer
 
 
-class EquipeListCreateAPIView(generics.ListCreateAPIView):
+class EquipeListCreateAPIView(_DaOrganizacaoMixin, generics.ListCreateAPIView):
     queryset = Equipe.objects.all()
     serializer_class = EquipeSerializer
 
 
-class EquipeRetrieveUpdateDestroyAPIView(_ExclusaoProtegidaMixin, generics.RetrieveUpdateDestroyAPIView):
+class EquipeRetrieveUpdateDestroyAPIView(_DaOrganizacaoMixin, _ExclusaoProtegidaMixin, generics.RetrieveUpdateDestroyAPIView):
     queryset = Equipe.objects.all()
     serializer_class = EquipeSerializer
 
 
-class CategoriaListCreateAPIView(generics.ListCreateAPIView):
+class CategoriaListCreateAPIView(_DaOrganizacaoMixin, generics.ListCreateAPIView):
     queryset = Categoria.objects.all()
     serializer_class = CategoriaSerializer
 
 
-class CategoriaRetrieveUpdateDestroyAPIView(_ExclusaoProtegidaMixin, generics.RetrieveUpdateDestroyAPIView):
+class CategoriaRetrieveUpdateDestroyAPIView(_DaOrganizacaoMixin, _ExclusaoProtegidaMixin, generics.RetrieveUpdateDestroyAPIView):
     queryset = Categoria.objects.all()
     serializer_class = CategoriaSerializer
 
 
-class PrioridadeListCreateAPIView(generics.ListCreateAPIView):
+class PrioridadeListCreateAPIView(_DaOrganizacaoMixin, generics.ListCreateAPIView):
     queryset = Prioridade.objects.all()
     serializer_class = PrioridadeSerializer
 
 
-class PrioridadeRetrieveUpdateDestroyAPIView(_ExclusaoProtegidaMixin, generics.RetrieveUpdateDestroyAPIView):
+class PrioridadeRetrieveUpdateDestroyAPIView(_DaOrganizacaoMixin, _ExclusaoProtegidaMixin, generics.RetrieveUpdateDestroyAPIView):
     queryset = Prioridade.objects.all()
     serializer_class = PrioridadeSerializer
 
 
-class SLAListCreateAPIView(generics.ListCreateAPIView):
+class SLAListCreateAPIView(_DaOrganizacaoMixin, generics.ListCreateAPIView):
     queryset = SLA.objects.select_related('categoria', 'prioridade')
     serializer_class = SLASerializer
 
 
-class SLARetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+class SLARetrieveUpdateDestroyAPIView(_DaOrganizacaoMixin, generics.RetrieveUpdateDestroyAPIView):
     queryset = SLA.objects.select_related('categoria', 'prioridade')
     serializer_class = SLASerializer

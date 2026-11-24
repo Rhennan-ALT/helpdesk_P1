@@ -33,7 +33,7 @@
             
             <!-- Direita: Perfil / Sair (Fora do Collapse de links) -->
             <div class="d-flex align-items-center gap-2 ms-auto ms-lg-0">
-                <span class="navbar-text me-2">Olá, {{ user.username }}</span>
+                <span class="navbar-text me-2">Olá, {{ user.username }}{% if user.perfil %} · {{ user.perfil.organizacao }}{% endif %}</span>
                 <form action="{% url 'logout' %}" method="post" class="d-inline m-0">
                     {% csrf_token %}
                     <button class="btn btn-outline-light btn-sm" type="submit">Sair</button>

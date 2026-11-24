@@ -8,23 +8,23 @@
 - [x] Exclusão protegida devolvendo 409
 - [x] Campo `tipo` exposto no serializer
 - [x] API testada pela Browsable API (navegador) e com curl
-- [ ] Filtrar toda a API pela organização do usuário (depende do Pilar 2)
+- [x] Filtrar toda a API pela organização do usuário
 - [ ] Permissões por papel nos endpoints de cadastro (depende do Pilar 3)
 
 ## Pilar 2 — Multi-organização 
-- [ ] Model `Organizacao` e base abstrata `DaOrganizacao`
-- [ ] FK de organização em Equipe, Categoria, Prioridade, SLA e Chamado
-- [ ] Migração em 3 etapas (FK nula → organização padrão via `RunPython` → FK obrigatória)
-- [ ] `Perfil` (usuário → organização) e cadastro no Admin
-- [ ] Unicidade por organização (`nome` de Equipe/Categoria/Prioridade, combinação do SLA)
-- [ ] `org_atual(request)`, filtro em todas as views, `get_object_or_404` com organização
-- [ ] Selects dos formulários filtrados pela organização (inclusive Responsável)
-- [ ] Roteiro de testes de isolamento com dois usuários de organizações diferentes
+- [x] Model `Organizacao` e base abstrata `DaOrganizacao`
+- [x] FK de organização em Equipe, Categoria, Prioridade, SLA e Chamado
+- [x] Migração em 3 etapas (FK nula → organização padrão via `RunPython` → FK obrigatória)
+- [x] `Perfil` (usuário → organização) e cadastro no Admin
+- [x] Unicidade por organização (`nome` de Equipe/Categoria/Prioridade, combinação do SLA)
+- [x] `org_atual(request)`, filtro em todas as views, `get_object_or_404` com organização
+- [x] Selects dos formulários filtrados pela organização (inclusive Responsável)
+- [x] Roteiro de testes de isolamento com dois usuários de organizações diferentes
 
 ## Pilar 3 — Perfis de acesso 
 - [ ] Campo `papel` (admin / operador) no `Perfil`
 - [ ] Restringir telas e endpoints de cadastro ao papel admin
-- [ ] Definir o comportamento do superusuário sem Perfil
+- [ ] Definir o comportamento do superusuário sem Perfil (hoje: erro 403 com aviso para criar o Perfil no Admin)
 
 ## Pilar 4 — Dashboard 
 Perguntas do dono do help desk:

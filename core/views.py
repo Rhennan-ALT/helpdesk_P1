@@ -3,12 +3,33 @@ from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.db import transaction
 from django.db.models import ProtectedError, Q
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
 from .forms import CadastroUsuarioForm, CategoriaForm, ChamadoForm, EquipeForm, PrioridadeForm, SLAForm
-from .models import SLA, Categoria, Chamado, Equipe, Prioridade
+from .dados_iniciais import criar_dados_iniciais
+from .models import SLA, Categoria, Chamado, Equipe, Organizacao, Perfil, Prioridade
+from .organizacao import org_atual
+
+
+class DaOrganizacaoMixin(LoginRequiredMixin):
+
+    def get_queryset(self):
+        return super().get_queryset().filter(organizacao=org_atual(self.request))
+
+
+class FormDaOrganizacaoMixin(DaOrganizacaoMixin):
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['org'] = org_atual(self.request)
+        return kwargs
+
+    def form_valid(self, form):
+        form.instance.organizacao = org_atual(self.request)
+        return super().form_valid(form)
 
 
 class ExclusaoProtegidaMixin:
@@ -27,7 +48,11 @@ def cadastro(request):
     if request.method == 'POST':
         form = CadastroUsuarioForm(request.POST)
         if form.is_valid():
-            usuario = form.save()
+            with transaction.atomic():
+                usuario = form.save()
+                org = Organizacao.objects.create(nome=form.cleaned_data['organizacao'])
+                Perfil.objects.create(usuario=usuario, organizacao=org)
+                criar_dados_iniciais(org)
             login(request, usuario)
             messages.success(request, 'Cadastro realizado com sucesso.')
             return redirect('painel')
@@ -41,7 +66,9 @@ def cadastro(request):
 @login_required
 def painel(request):
 
-    chamados = Chamado.objects.select_related('equipe', 'categoria', 'prioridade', 'responsavel')
+    chamados = Chamado.objects.filter(organizacao=org_atual(request)).select_related(
+        'equipe', 'categoria', 'prioridade', 'responsavel',
+    )
 
     if not request.user.is_staff:
         chamados = chamados.filter(Q(solicitante=request.user) | Q(responsavel=request.user))
@@ -81,7 +108,7 @@ class ChamadoPermissaoMixin(UserPassesTestMixin):
         chamado = self.get_object()
         return chamado.usuario_pode_gerenciar(self.request.user)
 
-class ChamadoCreateView(LoginRequiredMixin, CreateView):
+class ChamadoCreateView(FormDaOrganizacaoMixin, CreateView):
     model = Chamado
     form_class = ChamadoForm
     template_name = 'core/chamado_form.html'
@@ -92,12 +119,12 @@ class ChamadoCreateView(LoginRequiredMixin, CreateView):
         messages.success(self.request, 'Chamado aberto.')
         return super().form_valid(form)
 
-class ChamadoDetailView(LoginRequiredMixin, ChamadoPermissaoMixin, DetailView):
+class ChamadoDetailView(DaOrganizacaoMixin, ChamadoPermissaoMixin, DetailView):
     model = Chamado
     template_name = 'core/chamado_detail.html'
     context_object_name = 'chamado'
 
-class ChamadoUpdateView(LoginRequiredMixin, ChamadoPermissaoMixin, UpdateView):
+class ChamadoUpdateView(FormDaOrganizacaoMixin, ChamadoPermissaoMixin, UpdateView):
     model = Chamado
     form_class = ChamadoForm
     template_name = 'core/chamado_form.html'
@@ -107,7 +134,7 @@ class ChamadoUpdateView(LoginRequiredMixin, ChamadoPermissaoMixin, UpdateView):
         messages.success(self.request, 'Chamado atualizado.')
         return super().form_valid(form)
 
-class ChamadoDeleteView(LoginRequiredMixin, ChamadoPermissaoMixin, DeleteView):
+class ChamadoDeleteView(DaOrganizacaoMixin, ChamadoPermissaoMixin, DeleteView):
     model = Chamado
     template_name = 'core/confirm_delete.html'
     success_url = reverse_lazy('painel')
@@ -118,96 +145,96 @@ class ChamadoDeleteView(LoginRequiredMixin, ChamadoPermissaoMixin, DeleteView):
 
 
 #crud da equipe
-class EquipeListView(LoginRequiredMixin, ListView):
+class EquipeListView(DaOrganizacaoMixin, ListView):
     model = Equipe
     template_name = 'core/equipe_list.html'
     context_object_name = 'equipes'
 
-class EquipeCreateView(LoginRequiredMixin, CreateView):
+class EquipeCreateView(FormDaOrganizacaoMixin, CreateView):
     model = Equipe
     form_class = EquipeForm
     template_name = 'core/equipe_form.html'
     success_url = reverse_lazy('equipe_lista')
 
-class EquipeUpdateView(LoginRequiredMixin, UpdateView):
+class EquipeUpdateView(FormDaOrganizacaoMixin, UpdateView):
     model = Equipe
     form_class = EquipeForm
     template_name = 'core/equipe_form.html'
     success_url = reverse_lazy('equipe_lista')
 
-class EquipeDeleteView(LoginRequiredMixin, ExclusaoProtegidaMixin, DeleteView):
+class EquipeDeleteView(DaOrganizacaoMixin, ExclusaoProtegidaMixin, DeleteView):
     model = Equipe
     template_name = 'core/confirm_delete.html'
     success_url = reverse_lazy('equipe_lista')
 
 
 #crud das categorias
-class CategoriaListView(LoginRequiredMixin, ListView):
+class CategoriaListView(DaOrganizacaoMixin, ListView):
     model = Categoria
     template_name = 'core/categoria_list.html'
     context_object_name = 'categorias'
 
-class CategoriaCreateView(LoginRequiredMixin, CreateView):
+class CategoriaCreateView(FormDaOrganizacaoMixin, CreateView):
     model = Categoria
     form_class = CategoriaForm
     template_name = 'core/categoria_form.html'
     success_url = reverse_lazy('categoria_lista')
 
-class CategoriaUpdateView(LoginRequiredMixin, UpdateView):
+class CategoriaUpdateView(FormDaOrganizacaoMixin, UpdateView):
     model = Categoria
     form_class = CategoriaForm
     template_name = 'core/categoria_form.html'
     success_url = reverse_lazy('categoria_lista')
 
-class CategoriaDeleteView(LoginRequiredMixin, ExclusaoProtegidaMixin, DeleteView):
+class CategoriaDeleteView(DaOrganizacaoMixin, ExclusaoProtegidaMixin, DeleteView):
     model = Categoria
     template_name = 'core/confirm_delete.html'
     success_url = reverse_lazy('categoria_lista')
 
 
 # crud das prioridadas
-class PrioridadeListView(LoginRequiredMixin, ListView):
+class PrioridadeListView(DaOrganizacaoMixin, ListView):
     model = Prioridade
     template_name = 'core/prioridade_list.html'
     context_object_name = 'prioridades'
 
-class PrioridadeCreateView(LoginRequiredMixin, CreateView):
+class PrioridadeCreateView(FormDaOrganizacaoMixin, CreateView):
     model = Prioridade
     form_class = PrioridadeForm
     template_name = 'core/prioridade_form.html'
     success_url = reverse_lazy('prioridade_lista')
 
-class PrioridadeUpdateView(LoginRequiredMixin, UpdateView):
+class PrioridadeUpdateView(FormDaOrganizacaoMixin, UpdateView):
     model = Prioridade
     form_class = PrioridadeForm
     template_name = 'core/prioridade_form.html'
     success_url = reverse_lazy('prioridade_lista')
 
-class PrioridadeDeleteView(LoginRequiredMixin, ExclusaoProtegidaMixin, DeleteView):
+class PrioridadeDeleteView(DaOrganizacaoMixin, ExclusaoProtegidaMixin, DeleteView):
     model = Prioridade
     template_name = 'core/confirm_delete.html'
     success_url = reverse_lazy('prioridade_lista')
 
 
 #crud do SLA
-class SLAListView(LoginRequiredMixin, ListView):
+class SLAListView(DaOrganizacaoMixin, ListView):
     model = SLA
     template_name = 'core/sla_list.html'
     context_object_name = 'slas'
 
-class SLACreateView(LoginRequiredMixin, CreateView):
+class SLACreateView(FormDaOrganizacaoMixin, CreateView):
     model = SLA
     form_class = SLAForm
     template_name = 'core/sla_form.html'
     success_url = reverse_lazy('sla_lista')
 
-class SLAUpdateView(LoginRequiredMixin, UpdateView):
+class SLAUpdateView(FormDaOrganizacaoMixin, UpdateView):
     model = SLA
     form_class = SLAForm
     template_name = 'core/sla_form.html'
     success_url = reverse_lazy('sla_lista')
 
-class SLADeleteView(LoginRequiredMixin, DeleteView):
+class SLADeleteView(DaOrganizacaoMixin, DeleteView):
     model = SLA
     template_name = 'core/confirm_delete.html'
     success_url = reverse_lazy('sla_lista')

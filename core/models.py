@@ -4,33 +4,77 @@ from django.db import models
 from django.utils import timezone
 
 
+class Organizacao(models.Model):
+    nome = models.CharField('Nome', max_length=120)
+    criada_em = models.DateTimeField('Criada em', auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Organização'
+        verbose_name_plural = 'Organizações'
+        ordering = ['nome']
+
+    def __str__(self):
+        return self.nome
+
+
+class Perfil(models.Model):
+    usuario = models.OneToOneField(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name='Usuário',
+    )
+    organizacao = models.ForeignKey(
+        Organizacao, on_delete=models.PROTECT, related_name='perfis', verbose_name='Organização',
+    )
+
+    class Meta:
+        verbose_name = 'Perfil'
+        verbose_name_plural = 'Perfis'
+
+    def __str__(self):
+        return f'{self.usuario} ({self.organizacao})'
+
+
+class DaOrganizacao(models.Model):
+    organizacao = models.ForeignKey(
+        Organizacao, on_delete=models.PROTECT, verbose_name='Organização',
+    )
+
+    class Meta:
+        abstract = True
+
+
 # equpe
-class Equipe(models.Model):
-    nome = models.CharField('Nome', max_length = 100, unique = True)
+class Equipe(DaOrganizacao):
+    nome = models.CharField('Nome', max_length=100)
 
     class Meta:
         verbose_name = 'Equipe'
         verbose_name_plural = 'Equipes'
+        constraints = [
+            models.UniqueConstraint(fields=['organizacao', 'nome'], name='equipe_nome_unico_por_org'),
+        ]
         ordering = ['nome']
 
     def __str__(self):
         return self.nome
 
 # categoria
-class Categoria(models.Model):
-    nome = models.CharField('Nome', max_length = 100, unique = True)
+class Categoria(DaOrganizacao):
+    nome = models.CharField('Nome', max_length=100)
 
     class Meta:
         verbose_name = 'Categoria'
         verbose_name_plural = 'Categorias'
+        constraints = [
+            models.UniqueConstraint(fields=['organizacao', 'nome'], name='categoria_nome_unico_por_org'),
+        ]
         ordering = ['nome']
 
     def __str__(self):
         return self.nome
 
 # prioridade
-class Prioridade(models.Model):
-    nome = models.CharField('Nome', max_length = 50, unique = True)
+class Prioridade(DaOrganizacao):
+    nome = models.CharField('Nome', max_length=50)
 
     ordem = models.PositiveSmallIntegerField(
         'Ordem',
@@ -41,13 +85,16 @@ class Prioridade(models.Model):
     class Meta:
         verbose_name = 'Prioridade'
         verbose_name_plural = 'Prioridades'
+        constraints = [
+            models.UniqueConstraint(fields=['organizacao', 'nome'], name='prioridade_nome_unico_por_org'),
+        ]
         ordering = ['ordem', 'nome']
 
     def __str__(self):
         return self.nome
 
 # sla
-class SLA(models.Model):
+class SLA(DaOrganizacao):
     categoria = models.ForeignKey(
         Categoria, on_delete=models.CASCADE, related_name='slas', verbose_name='Categoria',
     )
@@ -82,7 +129,7 @@ class ChamadoQuerySet(models.QuerySet):
 
 
 # chamado
-class Chamado(models.Model):
+class Chamado(DaOrganizacao):
     STATUS_ABERTO = 'ABERTO'
     STATUS_ANDAMENTO = 'ANDAMENTO'
     STATUS_FECHADO = 'FECHADO'
