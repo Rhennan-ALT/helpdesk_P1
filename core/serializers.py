@@ -32,11 +32,11 @@ class ChamadoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Chamado
         fields = [
-            'id', 'titulo', 'descricao', 'status',
+            'id', 'titulo', 'descricao', 'tipo', 'status',
             'solicitante', 'responsavel', 'equipe', 'categoria', 'prioridade',
             'data_criacao', 'data_limite', 'data_fechamento', 'esta_atrasado',
         ]
-
+        
         read_only_fields = [
             'solicitante', 'data_criacao', 'data_limite', 'data_fechamento',
         ]
