@@ -3,12 +3,22 @@ from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.db.models import Q
+from django.db.models import ProtectedError, Q
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
 from .forms import CadastroUsuarioForm, CategoriaForm, ChamadoForm, EquipeForm, PrioridadeForm, SLAForm
 from .models import SLA, Categoria, Chamado, Equipe, Prioridade
+
+
+class ExclusaoProtegidaMixin:
+
+    def form_valid(self, form):
+        try:
+            return super().form_valid(form)
+        except ProtectedError:
+            messages.error(self.request, 'Não é possível excluir: há chamados vinculados a este registro.')
+            return redirect(self.success_url)
 
 
 #autenticar
@@ -42,8 +52,8 @@ def painel(request):
 
     apenas_atrasados = request.GET.get('atrasados') == '1'
     if apenas_atrasados:
-        chamados = [c for c in chamados if c.esta_atrasado]
-    
+        chamados = chamados.atrasados()
+
     tipo_selecionado = request.GET.get('tipo', '')
     if tipo_selecionado:
         chamados = chamados.filter(tipo=tipo_selecionado)
@@ -125,7 +135,7 @@ class EquipeUpdateView(LoginRequiredMixin, UpdateView):
     template_name = 'core/equipe_form.html'
     success_url = reverse_lazy('equipe_lista')
 
-class EquipeDeleteView(LoginRequiredMixin, DeleteView):
+class EquipeDeleteView(LoginRequiredMixin, ExclusaoProtegidaMixin, DeleteView):
     model = Equipe
     template_name = 'core/confirm_delete.html'
     success_url = reverse_lazy('equipe_lista')
@@ -149,7 +159,7 @@ class CategoriaUpdateView(LoginRequiredMixin, UpdateView):
     template_name = 'core/categoria_form.html'
     success_url = reverse_lazy('categoria_lista')
 
-class CategoriaDeleteView(LoginRequiredMixin, DeleteView):
+class CategoriaDeleteView(LoginRequiredMixin, ExclusaoProtegidaMixin, DeleteView):
     model = Categoria
     template_name = 'core/confirm_delete.html'
     success_url = reverse_lazy('categoria_lista')
@@ -173,7 +183,7 @@ class PrioridadeUpdateView(LoginRequiredMixin, UpdateView):
     template_name = 'core/prioridade_form.html'
     success_url = reverse_lazy('prioridade_lista')
 
-class PrioridadeDeleteView(LoginRequiredMixin, DeleteView):
+class PrioridadeDeleteView(LoginRequiredMixin, ExclusaoProtegidaMixin, DeleteView):
     model = Prioridade
     template_name = 'core/confirm_delete.html'
     success_url = reverse_lazy('prioridade_lista')
