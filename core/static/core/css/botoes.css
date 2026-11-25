@@ -1,0 +1,81 @@
+.btn {
+    border-radius: var(--raio-controle);
+    font-weight: 500;
+    font-size: .9rem;
+    padding: .5rem 1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+}
+
+.btn-sm {
+    padding: .3rem .65rem;
+    font-size: .82rem;
+}
+
+.btn-primary {
+    --bs-btn-bg: var(--ameixa);
+    --bs-btn-border-color: var(--ameixa);
+    --bs-btn-hover-bg: var(--ameixa-escura);
+    --bs-btn-hover-border-color: var(--ameixa-escura);
+    --bs-btn-active-bg: var(--ameixa-escura);
+    --bs-btn-active-border-color: var(--ameixa-escura);
+    --bs-btn-color: #FFFFFF;
+    --bs-btn-hover-color: #FFFFFF;
+    --bs-btn-active-color: #FFFFFF;
+    background-color: var(--ameixa);
+    background-image: none;
+    border-color: var(--ameixa);
+    color: #FFFFFF;
+}
+
+.btn-primary:hover {
+    background-color: var(--ameixa-escura);
+    border-color: var(--ameixa-escura);
+    color: #FFFFFF;
+}
+
+.btn-secundario {
+    background-color: var(--superficie);
+    border: 1px solid var(--linha);
+    color: var(--texto);
+}
+
+.btn-secundario:hover {
+    background-color: var(--nevoa);
+    border-color: #CFCADB;
+    color: var(--texto);
+}
+
+.btn-perigo {
+    background-color: var(--sla-atrasado);
+    border: 1px solid var(--sla-atrasado);
+    color: #FFFFFF;
+}
+
+.btn-perigo:hover {
+    background-color: #861F3E;
+    border-color: #861F3E;
+    color: #FFFFFF;
+}
+
+.btn-icone {
+    background: none;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    padding: .3rem .45rem;
+    color: var(--texto-suave);
+    line-height: 1;
+}
+
+.btn-icone:hover {
+    background-color: var(--nevoa);
+    border-color: var(--linha);
+    color: var(--texto);
+}
+
+.btn-icone.perigo:hover {
+    background-color: var(--sla-atrasado-fundo);
+    border-color: transparent;
+    color: var(--sla-atrasado);
+}

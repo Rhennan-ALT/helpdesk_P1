@@ -1,0 +1,83 @@
+:root {
+    --noite: #1E1A30;
+    --noite-2: #2A2542;
+    --noite-texto: #C9C3D9;
+    --ameixa: #4B2A63;
+    --ameixa-escura: #3A1F4D;
+    --ameixa-clara: #EFE8F4;
+    --nevoa: #F3F2F7;
+    --superficie: #FFFFFF;
+    --linha: #E2DFEA;
+    --texto: #1A1225;
+    --texto-suave: #6E6577;
+
+    --sla-ok: #2F7A62;
+    --sla-ok-fundo: #E3F1EC;
+    --sla-risco: #A86400;
+    --sla-risco-fundo: #FBEFD9;
+    --sla-atrasado: #A3294D;
+    --sla-atrasado-fundo: #F8E4EA;
+    --sla-fim: #8A8496;
+    --sla-fim-fundo: #EEEDF2;
+
+    --raio-superficie: 12px;
+    --raio-controle: 8px;
+    --largura-sidebar: 248px;
+
+    --bs-body-font-family: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    --bs-body-color: var(--texto);
+    --bs-body-bg: var(--nevoa);
+    --bs-link-color: var(--ameixa);
+    --bs-link-color-rgb: 75, 42, 99;
+    --bs-link-hover-color: var(--ameixa-escura);
+    --bs-border-color: var(--linha);
+    --bs-border-radius: var(--raio-controle);
+}
+
+body {
+    font-family: var(--bs-body-font-family);
+    background-color: var(--nevoa);
+    color: var(--texto);
+    font-size: .9375rem;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+}
+
+.num {
+    font-variant-numeric: tabular-nums;
+}
+
+:focus-visible {
+    outline: 2px solid var(--ameixa);
+    outline-offset: 2px;
+}
+
+h1, h2, h3, h4, h5 {
+    color: var(--texto);
+}
+
+.marca {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    color: #FFFFFF;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.05rem;
+    letter-spacing: -.01em;
+}
+
+.marca:hover {
+    color: #FFFFFF;
+}
+
+.marca-simbolo {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+    background-color: var(--ameixa);
+    font-size: .8rem;
+    font-weight: 600;
+}
