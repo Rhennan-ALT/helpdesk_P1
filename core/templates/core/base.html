@@ -25,16 +25,18 @@
                     <li class="nav-item"><a class="nav-link" href="{% url 'painel' %}">Painel de Chamados</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'chamado_novo' %}">+ Novo Chamado</a></li>
+                    {% if user.perfil.eh_admin %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'equipe_lista' %}">Equipes</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'categoria_lista' %}">Categorias</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'prioridade_lista' %}">Prioridades</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'sla_lista' %}">SLAs</a></li>
+                    {% endif %}
                 </ul>
             </div>
             
             <!-- Direita: Perfil / Sair (Fora do Collapse de links) -->
             <div class="d-flex align-items-center gap-2 ms-auto ms-lg-0">
-                <span class="navbar-text me-2">Olá, {{ user.username }}{% if user.perfil %} · {{ user.perfil.organizacao }}{% endif %}</span>
+                <span class="navbar-text me-2">Olá, {{ user.username }}{% if user.perfil %} · {{ user.perfil.organizacao }} ({{ user.perfil.get_papel_display }}){% endif %}</span>
                 <form action="{% url 'logout' %}" method="post" class="d-inline m-0">
                     {% csrf_token %}
                     <button class="btn btn-outline-light btn-sm" type="submit">Sair</button>

@@ -54,7 +54,9 @@
 
     <div class="mt-3">
         <a href="{% url 'chamado_editar' chamado.pk %}" class="btn btn-primary">Editar</a>
+        {% if user.perfil.eh_admin %}
         <a href="{% url 'chamado_excluir' chamado.pk %}" class="btn btn-outline-danger">Excluir</a>
+        {% endif %}
         <a href="{% url 'painel' %}" class="btn btn-outline-secondary">Voltar ao painel</a>
     </div>
 </div>

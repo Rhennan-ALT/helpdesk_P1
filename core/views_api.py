@@ -1,6 +1,7 @@
 from django.db.models import ProtectedError, Q
 from rest_framework import generics
 from rest_framework.exceptions import APIException, ValidationError
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -8,6 +9,7 @@ from . import dashboard as metricas_dashboard
 
 from .models import SLA, Categoria, Chamado, Equipe, Prioridade
 from .organizacao import org_atual
+from .permissoes import AdminOuSomenteLeitura, ExcluirSomenteAdmin, eh_admin
 from .serializers import (
     CategoriaSerializer, ChamadoSerializer, EquipeSerializer,
     PrioridadeSerializer, SLASerializer,
@@ -47,7 +49,7 @@ class _ChamadoQuerysetMixin:
             'solicitante', 'responsavel', 'equipe', 'categoria', 'prioridade',
         )
         user = self.request.user
-        if not user.is_staff:
+        if not eh_admin(user):
             qs = qs.filter(Q(solicitante=user) | Q(responsavel=user))
         return qs
 
@@ -60,45 +62,54 @@ class ChamadoListCreateAPIView(_ChamadoQuerysetMixin, generics.ListCreateAPIView
 
 
 class ChamadoRetrieveUpdateDestroyAPIView(_ChamadoQuerysetMixin, generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated, ExcluirSomenteAdmin]
     serializer_class = ChamadoSerializer
 
 
 class EquipeListCreateAPIView(_DaOrganizacaoMixin, generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated, AdminOuSomenteLeitura]
     queryset = Equipe.objects.all()
     serializer_class = EquipeSerializer
 
 
 class EquipeRetrieveUpdateDestroyAPIView(_DaOrganizacaoMixin, _ExclusaoProtegidaMixin, generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated, AdminOuSomenteLeitura]
     queryset = Equipe.objects.all()
     serializer_class = EquipeSerializer
 
 
 class CategoriaListCreateAPIView(_DaOrganizacaoMixin, generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated, AdminOuSomenteLeitura]
     queryset = Categoria.objects.all()
     serializer_class = CategoriaSerializer
 
 
 class CategoriaRetrieveUpdateDestroyAPIView(_DaOrganizacaoMixin, _ExclusaoProtegidaMixin, generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated, AdminOuSomenteLeitura]
     queryset = Categoria.objects.all()
     serializer_class = CategoriaSerializer
 
 
 class PrioridadeListCreateAPIView(_DaOrganizacaoMixin, generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated, AdminOuSomenteLeitura]
     queryset = Prioridade.objects.all()
     serializer_class = PrioridadeSerializer
 
 
 class PrioridadeRetrieveUpdateDestroyAPIView(_DaOrganizacaoMixin, _ExclusaoProtegidaMixin, generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated, AdminOuSomenteLeitura]
     queryset = Prioridade.objects.all()
     serializer_class = PrioridadeSerializer
 
 
 class SLAListCreateAPIView(_DaOrganizacaoMixin, generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated, AdminOuSomenteLeitura]
     queryset = SLA.objects.select_related('categoria', 'prioridade')
     serializer_class = SLASerializer
 
 
 class SLARetrieveUpdateDestroyAPIView(_DaOrganizacaoMixin, generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated, AdminOuSomenteLeitura]
     queryset = SLA.objects.select_related('categoria', 'prioridade')
     serializer_class = SLASerializer
 
@@ -111,5 +122,5 @@ class DashboardAPIView(APIView):
         )
         if form.errors:
             raise ValidationError(form.errors)
-        return Response(metricas_dashboard.metricas(base, com_series=request.user.is_staff))
+        return Response(metricas_dashboard.metricas(base, com_series=eh_admin(request.user)))
 
