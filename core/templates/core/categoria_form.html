@@ -1,17 +1,17 @@
 {% extends 'core/base.html' %}
-{% block title %}{% if object %}Editar Categoria{% else %}Nova Categoria{% endif %}{% endblock %}
+{% block title %}{% if object %}Editar categoria{% else %}Nova categoria{% endif %}{% endblock %}
+{% block page_title %}{% if object %}Editar {{ object }}{% else %}Nova categoria{% endif %}{% endblock %}
+
 {% block content %}
-<h3>{% if object %}Editar Categoria{% else %}Nova Categoria{% endif %}</h3>
-<form method="post" class="form-area mt-3">
+<form method="post" class="superficie superficie-corpo estreito" novalidate>
     {% csrf_token %}
+    {% include 'core/_erros_form.html' %}
     {% for field in form %}
-        <div class="mb-3">
-            <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
-            {{ field }}
-            {% if field.errors %}<div class="text-danger small">{{ field.errors }}</div>{% endif %}
-        </div>
+        <div class="mb-3">{% include 'core/_campo.html' %}</div>
     {% endfor %}
-    <button type="submit" class="btn btn-primary">Salvar</button>
-    <a href="{% url 'categoria_lista' %}" class="btn btn-outline-secondary">Cancelar</a>
+    <div class="form-acoes">
+        <button type="submit" class="btn btn-primary">{% if object %}Salvar alterações{% else %}Criar categoria{% endif %}</button>
+        <a href="{% url 'categoria_lista' %}" class="btn btn-secundario">Cancelar</a>
+    </div>
 </form>
 {% endblock %}
