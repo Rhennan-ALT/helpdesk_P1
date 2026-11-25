@@ -34,10 +34,12 @@ Perguntas do dono do help desk:
 4. Quais equipes/categorias recebem mais chamados? → **ranking**
 5. Como evolui o volume de chamados por mês? → **série temporal**
 
-- [ ] `core/dashboard.py` com as métricas (aggregate/annotate), sempre partindo da organização
-- [ ] Filtro por período validado com `PeriodoForm`
-- [ ] Tela com cartões, tabela e gráfico Chart.js (`json_script`)
-- [ ] Exportação CSV e endpoint `/api/dashboard/`
+- [x] `core/dashboard.py` com as métricas (aggregate/annotate), sempre partindo da organização
+- [x] Filtro por período validado com `PeriodoForm`
+- [x] Tela com cartões, tabela e gráfico Chart.js (`json_script`)
+- [x] Exportação CSV e endpoint `/api/dashboard/`
+- [x] Índice em Chamado (`organizacao`, `data_criacao`)
+- [x] Série por mês, lista de atrasados e CSV só para administradores (`is_staff` até existir o campo `papel`)
 - [ ] Testes das métricas e `assertNumQueries` contra N+1
 
 ## Infra

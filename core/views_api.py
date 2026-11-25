@@ -1,6 +1,10 @@
 from django.db.models import ProtectedError, Q
 from rest_framework import generics
-from rest_framework.exceptions import APIException
+from rest_framework.exceptions import APIException, ValidationError
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from . import dashboard as metricas_dashboard
 
 from .models import SLA, Categoria, Chamado, Equipe, Prioridade
 from .organizacao import org_atual
@@ -97,3 +101,15 @@ class SLAListCreateAPIView(_DaOrganizacaoMixin, generics.ListCreateAPIView):
 class SLARetrieveUpdateDestroyAPIView(_DaOrganizacaoMixin, generics.RetrieveUpdateDestroyAPIView):
     queryset = SLA.objects.select_related('categoria', 'prioridade')
     serializer_class = SLASerializer
+
+
+class DashboardAPIView(APIView):
+
+    def get(self, request):
+        base, form = metricas_dashboard.filtrar_periodo(
+            request, metricas_dashboard.base_do_dashboard(org_atual(request)),
+        )
+        if form.errors:
+            raise ValidationError(form.errors)
+        return Response(metricas_dashboard.metricas(base, com_series=request.user.is_staff))
+

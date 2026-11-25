@@ -4,6 +4,8 @@ from . import views
 urlpatterns = [
     path('', views.painel, name='painel'),
     path('cadastro/', views.cadastro, name='cadastro'),
+    path('dashboard/', views.dashboard, name='dashboard'),
+    path('dashboard/exportar.csv', views.exportar_csv, name='dashboard_csv'),
 
     #chamados
     path('chamados/novo/', views.ChamadoCreateView.as_view(), name='chamado_novo'),

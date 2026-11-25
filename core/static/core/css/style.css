@@ -210,3 +210,27 @@ a:hover {
 .alert-danger  { background-color: #F6E3EA; color: #7A1F3D; }
 .alert-warning { background-color: #FBF0DC; color: #7A5A14; }
 .alert-info    { background-color: #EDE7F2; color: var(--cor-roxo); }
+
+.kpi {
+    background-color: var(--cor-branco);
+    border-radius: var(--raio);
+    padding: 1rem 1.25rem;
+    height: 100%;
+}
+
+.kpi small {
+    display: block;
+    color: var(--cor-texto-suave);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: .75rem;
+}
+
+.kpi strong {
+    font-size: 2rem;
+    color: var(--cor-roxo);
+}
+
+.kpi-alerta strong {
+    color: #7A1F3D;
+}

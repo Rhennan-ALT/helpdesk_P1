@@ -3,6 +3,8 @@ from django.urls import path
 from . import views_api
 
 urlpatterns = [
+    path('dashboard/', views_api.DashboardAPIView.as_view(), name='api-dashboard'),
+
     path('chamados/', views_api.ChamadoListCreateAPIView.as_view(), name='api-chamado-list'),
     path('chamados/<int:pk>/', views_api.ChamadoRetrieveUpdateDestroyAPIView.as_view(), name='api-chamado-detail'),
 
