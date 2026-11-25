@@ -1,0 +1,8 @@
+{% with s=chamado.situacao_sla %}
+<span class="prazo sla-{{ s }}">
+    {% if s == 'concluido' %}Concluído
+    {% elif s == 'sem_prazo' %}Sem SLA
+    {% elif s == 'atrasado' %}Atrasado há {{ chamado.data_limite|timesince }}
+    {% else %}Vence em {{ chamado.data_limite|timeuntil }}{% endif %}
+</span>
+{% endwith %}
