@@ -1,13 +1,16 @@
 {% extends 'core/base.html' %}
 {% block title %}Confirmar exclusão{% endblock %}
+{% block page_title %}Confirmar exclusão{% endblock %}
+
 {% block content %}
-<div>
-    <h3>Confirmar exclusão</h3>
-    <p>Tem certeza que deseja excluir <strong>{{ object }}</strong>? Essa ação não pode ser desfeita.</p>
-    <form method="post">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-danger">Sim, excluir</button>
-        <a href="javascript:history.back()" class="btn btn-outline-secondary">Cancelar</a>
-    </form>
-</div>
+<form method="post" class="superficie superficie-corpo confirmacao">
+    {% csrf_token %}
+    <div class="icone"><i class="bi bi-trash"></i></div>
+    <h2 class="secao-titulo">Excluir “{{ object }}”?</h2>
+    <p class="mb-0">Esta ação não pode ser desfeita.</p>
+    <div class="form-acoes mt-4">
+        <button type="submit" class="btn btn-perigo">Excluir</button>
+        <a href="javascript:history.back()" class="btn btn-secundario">Cancelar</a>
+    </div>
+</form>
 {% endblock %}

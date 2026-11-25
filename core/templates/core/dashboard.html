@@ -1,115 +1,111 @@
 {% extends 'core/base.html' %}
 {% load static %}
 {% block title %}Dashboard{% endblock %}
-{% block content %}
-
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h3>Dashboard</h3>
+{% block estilos %}<link href="{% static 'core/css/dashboard.css' %}" rel="stylesheet">{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block page_subtitle %}<p>{% if form.is_valid and form.cleaned_data.inicio or form.is_valid and form.cleaned_data.fim %}Chamados abertos {% if form.cleaned_data.inicio %}de {{ form.cleaned_data.inicio|date:"d/m/Y" }} {% endif %}{% if form.cleaned_data.fim %}até {{ form.cleaned_data.fim|date:"d/m/Y" }}{% endif %}{% else %}Todos os chamados da organização{% endif %}</p>{% endblock %}
+{% block page_actions %}
     {% if eh_admin %}
-        <a href="{% url 'dashboard_csv' %}?{{ request.GET.urlencode }}" class="btn btn-outline-primary">Exportar CSV</a>
+        <a href="{% url 'dashboard_csv' %}?{{ request.GET.urlencode }}" class="btn btn-secundario"><i class="bi bi-download"></i><span class="rotulo">Exportar CSV</span></a>
     {% endif %}
-</div>
+{% endblock %}
 
-<form method="get" class="row g-2 mb-4 align-items-end">
-    <div class="col-auto">
-        <label class="form-label mb-0" for="{{ form.inicio.id_for_label }}">{{ form.inicio.label }}</label>
-        {{ form.inicio }}
-    </div>
-    <div class="col-auto">
-        <label class="form-label mb-0" for="{{ form.fim.id_for_label }}">{{ form.fim.label }}</label>
-        {{ form.fim }}
-    </div>
-    <div class="col-auto">
-        <button type="submit" class="btn btn-primary">Filtrar</button>
-        <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">Limpar</a>
-    </div>
-    {% if form.errors %}
-        <div class="col-12">
-            <div class="alert alert-danger mb-0">
-                Período inválido: os filtros foram ignorados.
-                {% for erro in form.non_field_errors %}{{ erro }}{% endfor %}
-            </div>
-        </div>
-    {% endif %}
+{% block content %}
+<form method="get" class="superficie filtros filtros-solo mb-4">
+    <label class="form-label m-0" for="{{ form.inicio.id_for_label }}">De</label>
+    {{ form.inicio }}
+    <label class="form-label m-0" for="{{ form.fim.id_for_label }}">até</label>
+    {{ form.fim }}
+    <button type="submit" class="btn btn-primary">Aplicar</button>
+    {% if request.GET %}<a href="{% url 'dashboard' %}" class="btn btn-secundario">Limpar</a>{% endif %}
 </form>
 
-<div class="row g-3 mb-4">
-    <div class="col-6 col-md"><div class="kpi"><small>Total</small><strong>{{ kpis.total }}</strong></div></div>
-    <div class="col-6 col-md"><div class="kpi"><small>Abertos</small><strong>{{ kpis.abertos }}</strong></div></div>
-    <div class="col-6 col-md"><div class="kpi"><small>Em atendimento</small><strong>{{ kpis.em_atendimento }}</strong></div></div>
-    <div class="col-6 col-md"><div class="kpi"><small>Concluídos</small><strong>{{ kpis.concluidos }}</strong></div></div>
-    <div class="col-12 col-md"><div class="kpi kpi-alerta"><small>Fora do prazo</small><strong>{{ kpis.atrasados }}</strong></div></div>
+{% if form.errors %}
+    <div class="aviso aviso-warning">
+        Período inválido, mostrando todos os chamados.
+        {% for erro in form.non_field_errors %}{{ erro }}{% endfor %}
+    </div>
+{% endif %}
+
+<div class="superficie kpis mb-4">
+    <div class="kpi"><span>Total</span><strong>{{ kpis.total }}</strong></div>
+    <div class="kpi"><span>Abertos</span><strong>{{ kpis.abertos }}</strong></div>
+    <div class="kpi"><span>Em atendimento</span><strong>{{ kpis.em_atendimento }}</strong></div>
+    <div class="kpi"><span>Concluídos</span><strong>{{ kpis.concluidos }}</strong></div>
+    <div class="kpi alerta"><span>Fora do prazo</span><strong>{{ kpis.atrasados }}</strong></div>
 </div>
 
 <div class="row g-4 mb-4">
-    <div class="col-md-6">
-        <h5>Chamados por status</h5>
-        <canvas id="grafico-status" height="220"></canvas>
+    <div class="col-lg-6">
+        <div class="superficie superficie-corpo h-100">
+            <h2 class="secao-titulo">Por status</h2>
+            <canvas id="grafico-status" height="200"></canvas>
+        </div>
     </div>
-    <div class="col-md-6">
-        <h5>Chamados por tipo</h5>
-        <canvas id="grafico-tipo" height="220"></canvas>
+    <div class="col-lg-6">
+        <div class="superficie superficie-corpo h-100">
+            <h2 class="secao-titulo">Por tipo</h2>
+            <canvas id="grafico-tipo" height="200"></canvas>
+        </div>
     </div>
 </div>
 
 {% if eh_admin %}
-<div class="mb-4">
-    <h5>Chamados abertos por mês</h5>
+<div class="superficie superficie-corpo mb-4">
+    <h2 class="secao-titulo">Chamados abertos por mês</h2>
     {% if por_mes %}
-        <canvas id="grafico-mes" height="110"></canvas>
+        <canvas id="grafico-mes" height="90"></canvas>
     {% else %}
-        <p class="text-muted">Sem dados no período.</p>
+        <div class="vazio"><i class="bi bi-graph-up"></i><p>Sem chamados no período.</p></div>
     {% endif %}
 </div>
 {% endif %}
 
 <div class="row g-4 mb-4">
-    <div class="col-md-6">
-        <h5>Equipes com mais chamados</h5>
-        <table class="table">
-            <thead><tr><th>Equipe</th><th class="text-end">Chamados</th></tr></thead>
-            <tbody>
+    <div class="col-lg-6">
+        <div class="superficie superficie-corpo h-100">
+            <h2 class="secao-titulo">Equipes com mais chamados</h2>
+            <ul class="ranking list-unstyled m-0">
             {% for item in ranking_equipes %}
-                <tr><td>{{ item.equipe__nome }}</td><td class="text-end">{{ item.total }}</td></tr>
+                <li><span>{{ item.equipe__nome }}</span><span class="num">{{ item.total }}</span>
+                    <progress class="barra" value="{{ item.total }}" max="{{ ranking_equipes.0.total }}" aria-label="{{ item.equipe__nome }}">{{ item.total }}</progress></li>
             {% empty %}
-                <tr><td colspan="2" class="text-muted">Sem dados no período.</td></tr>
+                <li class="text-muted">Sem dados no período.</li>
             {% endfor %}
-            </tbody>
-        </table>
+            </ul>
+        </div>
     </div>
-    <div class="col-md-6">
-        <h5>Categorias com mais chamados</h5>
-        <table class="table">
-            <thead><tr><th>Categoria</th><th class="text-end">Chamados</th></tr></thead>
-            <tbody>
+    <div class="col-lg-6">
+        <div class="superficie superficie-corpo h-100">
+            <h2 class="secao-titulo">Categorias com mais chamados</h2>
+            <ul class="ranking list-unstyled m-0">
             {% for item in ranking_categorias %}
-                <tr><td>{{ item.categoria__nome }}</td><td class="text-end">{{ item.total }}</td></tr>
+                <li><span>{{ item.categoria__nome }}</span><span class="num">{{ item.total }}</span>
+                    <progress class="barra" value="{{ item.total }}" max="{{ ranking_categorias.0.total }}" aria-label="{{ item.categoria__nome }}">{{ item.total }}</progress></li>
             {% empty %}
-                <tr><td colspan="2" class="text-muted">Sem dados no período.</td></tr>
+                <li class="text-muted">Sem dados no período.</li>
+            {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+
+{% if eh_admin %}
+<div class="superficie">
+    <div class="superficie-corpo pb-0"><h2 class="secao-titulo">Chamados fora do prazo</h2></div>
+    <div class="tabela-rolagem">
+        <table class="tabela">
+            <thead><tr><th>Chamado</th><th class="d-none d-md-table-cell">Equipe</th><th class="d-none d-md-table-cell">Prioridade</th><th class="d-none d-sm-table-cell">Status</th><th>Prazo</th></tr></thead>
+            <tbody>
+            {% for chamado in atrasados %}
+                {% include 'core/_linha_chamado.html' %}
+            {% empty %}
+                <tr><td colspan="5"><div class="vazio"><i class="bi bi-check2-circle"></i><p class="m-0">Nenhum chamado fora do prazo.</p></div></td></tr>
             {% endfor %}
             </tbody>
         </table>
     </div>
 </div>
-
-{% if eh_admin %}
-<h5>Chamados fora do prazo</h5>
-<table class="table">
-    <thead><tr><th>#</th><th>Título</th><th>Equipe</th><th>Prioridade</th><th>Prazo (SLA)</th></tr></thead>
-    <tbody>
-    {% for c in atrasados %}
-        <tr>
-            <td><a href="{% url 'chamado_detalhe' c.pk %}">#{{ c.pk }}</a></td>
-            <td>{{ c.titulo }}</td>
-            <td>{{ c.equipe.nome }}</td>
-            <td>{{ c.prioridade.nome }}</td>
-            <td>{{ c.data_limite|date:"d/m/Y H:i" }}</td>
-        </tr>
-    {% empty %}
-        <tr><td colspan="5" class="text-muted">Nenhum chamado fora do prazo.</td></tr>
-    {% endfor %}
-    </tbody>
-</table>
 {% endif %}
 
 {{ por_status|json_script:"dados-status" }}

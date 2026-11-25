@@ -1,19 +1,22 @@
 {% extends 'core/base.html' %}
-{% block title %}{% if object %}Editar Chamado{% else %}Novo Chamado{% endif %}{% endblock %}
-{% block content %}
-<h3>{% if object %}Editar Chamado #{{ object.pk }}{% else %}Novo Chamado{% endif %}</h3>
+{% block title %}{% if object %}Editar chamado #{{ object.pk }}{% else %}Novo chamado{% endif %}{% endblock %}
+{% block page_title %}{% if object %}Editar chamado{% else %}Novo chamado{% endif %}{% endblock %}
+{% block page_subtitle %}<p>{% if object %}<span class="num">#{{ object.pk }}</span> {{ object.titulo }}{% else %}O prazo é calculado pelo SLA da categoria e da prioridade{% endif %}</p>{% endblock %}
 
-<form method="post" class="form-area mt-3">
+{% block content %}
+<form method="post" class="superficie superficie-corpo estreito" novalidate>
     {% csrf_token %}
-    {% for field in form %}
-        <div class="mb-3">
-            <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
-            {{ field }}
-            {% if field.errors %}<div class="text-danger small">{{ field.errors }}</div>{% endif %}
-            {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
-        </div>
-    {% endfor %}
-    <button type="submit" class="btn btn-primary">Salvar</button>
-    <a href="{% url 'painel' %}" class="btn btn-outline-secondary">Cancelar</a>
+    {% include 'core/_erros_form.html' %}
+    <div class="row g-3">
+        {% for field in form %}
+            <div class="{% if field.name == 'titulo' or field.name == 'descricao' %}col-12{% else %}col-md-6{% endif %}">
+                {% include 'core/_campo.html' %}
+            </div>
+        {% endfor %}
+    </div>
+    <div class="form-acoes mt-4">
+        <button type="submit" class="btn btn-primary">{% if object %}Salvar alterações{% else %}Abrir chamado{% endif %}</button>
+        <a href="{% if object %}{% url 'chamado_detalhe' object.pk %}{% else %}{% url 'painel' %}{% endif %}" class="btn btn-secundario">Cancelar</a>
+    </div>
 </form>
 {% endblock %}

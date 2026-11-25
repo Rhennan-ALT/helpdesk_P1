@@ -1,0 +1,15 @@
+{% extends 'core/base.html' %}
+{% block title %}Sem acesso{% endblock %}
+{% block page_title %}Sem acesso{% endblock %}
+
+{% block content %}
+<div class="superficie superficie-corpo confirmacao">
+    <div class="icone"><i class="bi bi-lock"></i></div>
+    <h2 class="secao-titulo">Você não pode abrir esta página</h2>
+    <p>{{ exception|default:"Seu papel nesta organização não permite esta ação." }}</p>
+    <p class="text-muted mb-0">Se precisar de acesso, peça a um administrador da sua organização.</p>
+    <div class="form-acoes mt-4">
+        <a href="{% url 'painel' %}" class="btn btn-primary">Ir para os chamados</a>
+    </div>
+</div>
+{% endblock %}

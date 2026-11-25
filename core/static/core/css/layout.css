@@ -1,0 +1,137 @@
+.sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    width: var(--largura-sidebar);
+    background-color: var(--noite);
+    color: var(--noite-texto);
+    display: flex;
+    flex-direction: column;
+    z-index: 1040;
+    transition: transform .2s ease;
+}
+
+.area {
+    margin-left: var(--largura-sidebar);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-fundo {
+    display: none;
+}
+
+@media (max-width: 991.98px) {
+    .sidebar {
+        transform: translateX(-100%);
+    }
+
+    .sidebar.aberta {
+        transform: translateX(0);
+        box-shadow: 0 0 40px rgba(14, 10, 26, .4);
+    }
+
+    .sidebar-fundo.visivel {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(14, 10, 26, .45);
+        z-index: 1030;
+    }
+
+    .area {
+        margin-left: 0;
+    }
+}
+
+.topo {
+    position: sticky;
+    top: 0;
+    z-index: 1020;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    min-height: 68px;
+    padding: .75rem 2rem;
+    background-color: var(--superficie);
+    border-bottom: 1px solid var(--linha);
+}
+
+.btn-menu {
+    background: none;
+    border: 1px solid var(--linha);
+    border-radius: var(--raio-controle);
+    padding: .3rem .5rem;
+    font-size: 1.2rem;
+    line-height: 1;
+    color: var(--texto);
+}
+
+.topo-titulo {
+    flex: 1;
+    min-width: 0;
+}
+
+.topo-titulo h1 {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 600;
+    letter-spacing: -.015em;
+}
+
+.topo-titulo p {
+    margin: 0;
+    color: var(--texto-suave);
+    font-size: .85rem;
+}
+
+.topo-acoes {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+}
+
+.conteudo {
+    flex: 1;
+    padding: 1.75rem 2rem 3rem;
+}
+
+@media (max-width: 575.98px) {
+    .topo {
+        padding: .75rem 1rem;
+    }
+
+    .conteudo {
+        padding: 1.25rem 1rem 2rem;
+    }
+
+    .topo-acoes .btn .rotulo {
+        display: none;
+    }
+}
+
+.superficie {
+    background-color: var(--superficie);
+    border: 1px solid var(--linha);
+    border-radius: var(--raio-superficie);
+}
+
+.superficie-corpo {
+    padding: 1.5rem;
+}
+
+.secao-titulo {
+    margin: 0 0 .9rem;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.estreito {
+    max-width: 720px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sidebar {
+        transition: none;
+    }
+}

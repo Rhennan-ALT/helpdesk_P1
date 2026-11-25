@@ -3,7 +3,11 @@ function lerDados(id) {
     return elemento ? JSON.parse(elemento.textContent) : null;
 }
 
-const CORES = ['#4B2A63', '#BBAAB8', '#292643', '#7A5A9A', '#D9D9D9'];
+const CORES = ['#4B2A63', '#8E6BAA', '#C9B8D8'];
+
+Chart.defaults.font.family = "'IBM Plex Sans', system-ui, sans-serif";
+Chart.defaults.color = '#6E6577';
+Chart.defaults.borderColor = '#E2DFEA';
 
 function graficoDeBarras(canvasId, dados, rotulo, campoRotulo) {
     const canvas = document.getElementById(canvasId);
@@ -12,7 +16,7 @@ function graficoDeBarras(canvasId, dados, rotulo, campoRotulo) {
         type: 'bar',
         data: {
             labels: dados.map(d => d[campoRotulo]),
-            datasets: [{ label: rotulo, data: dados.map(d => d.total), backgroundColor: CORES }],
+            datasets: [{ label: rotulo, data: dados.map(d => d.total), backgroundColor: CORES, borderRadius: 6, maxBarThickness: 56 }],
         },
         options: {
             plugins: { legend: { display: false } },

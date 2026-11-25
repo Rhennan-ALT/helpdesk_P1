@@ -264,6 +264,29 @@ class Chamado(DaOrganizacao):
             return False
         return timezone.now() > self.data_limite
 
+    @property
+    def sla_consumido(self):
+        if not self.data_limite or not self.data_criacao:
+            return 0
+        fim = self.data_fechamento or timezone.now()
+        total = (self.data_limite - self.data_criacao).total_seconds()
+        if total <= 0:
+            return 100
+        usado = (fim - self.data_criacao).total_seconds() / total * 100
+        return max(0, min(100, round(usado)))
+
+    @property
+    def situacao_sla(self):
+        if self.status == self.STATUS_FECHADO:
+            return 'concluido'
+        if not self.data_limite:
+            return 'sem_prazo'
+        if self.esta_atrasado:
+            return 'atrasado'
+        if self.sla_consumido >= 75:
+            return 'em_risco'
+        return 'no_prazo'
+
     def usuario_pode_gerenciar(self, user):
         perfil = getattr(user, 'perfil', None)
         if perfil is not None and perfil.eh_admin:

@@ -3,7 +3,7 @@
 ## Pilar 1 — API REST (DRF) 
 - [x] Instalar DRF e registrar em `INSTALLED_APPS`
 - [x] Serializers de Equipe, Categoria, Prioridade, SLA e Chamado (fields explícitos, sem `__all__`)
-- [x] Views generics (ListCreate / RetrieveUpdateDestroy) e `api_urls.py` com prefixo `/api/`
+- [x] Views generics (ListCreate / RetrieveUpdateDestroy) e `urls_api.py` com prefixo `/api/`
 - [x] Autenticação por sessão + `IsAuthenticated` como padrão
 - [x] Exclusão protegida devolvendo 409
 - [x] Campo `tipo` exposto no serializer
@@ -42,7 +42,7 @@ Perguntas do dono do help desk:
 - [x] Exportação CSV e endpoint `/api/dashboard/`
 - [x] Índice em Chamado (`organizacao`, `data_criacao`)
 - [x] Série por mês, lista de atrasados e CSV só para o papel admin
-- [ ] Testes das métricas e `assertNumQueries` contra N+1
+- [x] Testes das métricas e `assertNumQueries` contra N+1 (`core/tests/test_dashboard.py`)
 
 ## Infra
 - [x] Migrar de SQLite para PostgreSQL, configurações via `.env`
