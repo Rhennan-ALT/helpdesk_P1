@@ -102,6 +102,7 @@
 @media (max-width: 767.98px) {
     .auth {
         grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
     }
 
     .auth-lado {
