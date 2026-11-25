@@ -1,11 +1,9 @@
 import csv
-
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.db.models import ProtectedError, Q
 from django.http import HttpResponse
@@ -18,6 +16,7 @@ from . import dashboard as metricas_dashboard
 from .dados_iniciais import criar_dados_iniciais
 from .models import SLA, Categoria, Chamado, Equipe, Organizacao, Perfil, Prioridade
 from .organizacao import org_atual
+from .permissoes import PapelRequeridoMixin, eh_admin, papel_requerido
 
 
 class DaOrganizacaoMixin(LoginRequiredMixin):
@@ -57,7 +56,7 @@ def cadastro(request):
             with transaction.atomic():
                 usuario = form.save()
                 org = Organizacao.objects.create(nome=form.cleaned_data['organizacao'])
-                Perfil.objects.create(usuario=usuario, organizacao=org)
+                Perfil.objects.create(usuario=usuario, organizacao=org, papel=Perfil.PAPEL_ADMIN)
                 criar_dados_iniciais(org)
             login(request, usuario)
             messages.success(request, 'Cadastro realizado com sucesso.')
@@ -76,7 +75,7 @@ def painel(request):
         'equipe', 'categoria', 'prioridade', 'responsavel',
     )
 
-    if not request.user.is_staff:
+    if not eh_admin(request.user):
         chamados = chamados.filter(Q(solicitante=request.user) | Q(responsavel=request.user))
 
     status_selecionado = request.GET.get('status', '')
@@ -140,7 +139,7 @@ class ChamadoUpdateView(FormDaOrganizacaoMixin, ChamadoPermissaoMixin, UpdateVie
         messages.success(self.request, 'Chamado atualizado.')
         return super().form_valid(form)
 
-class ChamadoDeleteView(DaOrganizacaoMixin, ChamadoPermissaoMixin, DeleteView):
+class ChamadoDeleteView(DaOrganizacaoMixin, PapelRequeridoMixin, ChamadoPermissaoMixin, DeleteView):
     model = Chamado
     template_name = 'core/confirm_delete.html'
     success_url = reverse_lazy('painel')
@@ -151,96 +150,96 @@ class ChamadoDeleteView(DaOrganizacaoMixin, ChamadoPermissaoMixin, DeleteView):
 
 
 #crud da equipe
-class EquipeListView(DaOrganizacaoMixin, ListView):
+class EquipeListView(DaOrganizacaoMixin, PapelRequeridoMixin, ListView):
     model = Equipe
     template_name = 'core/equipe_list.html'
     context_object_name = 'equipes'
 
-class EquipeCreateView(FormDaOrganizacaoMixin, CreateView):
+class EquipeCreateView(FormDaOrganizacaoMixin, PapelRequeridoMixin, CreateView):
     model = Equipe
     form_class = EquipeForm
     template_name = 'core/equipe_form.html'
     success_url = reverse_lazy('equipe_lista')
 
-class EquipeUpdateView(FormDaOrganizacaoMixin, UpdateView):
+class EquipeUpdateView(FormDaOrganizacaoMixin, PapelRequeridoMixin, UpdateView):
     model = Equipe
     form_class = EquipeForm
     template_name = 'core/equipe_form.html'
     success_url = reverse_lazy('equipe_lista')
 
-class EquipeDeleteView(DaOrganizacaoMixin, ExclusaoProtegidaMixin, DeleteView):
+class EquipeDeleteView(DaOrganizacaoMixin, PapelRequeridoMixin, ExclusaoProtegidaMixin, DeleteView):
     model = Equipe
     template_name = 'core/confirm_delete.html'
     success_url = reverse_lazy('equipe_lista')
 
 
 #crud das categorias
-class CategoriaListView(DaOrganizacaoMixin, ListView):
+class CategoriaListView(DaOrganizacaoMixin, PapelRequeridoMixin, ListView):
     model = Categoria
     template_name = 'core/categoria_list.html'
     context_object_name = 'categorias'
 
-class CategoriaCreateView(FormDaOrganizacaoMixin, CreateView):
+class CategoriaCreateView(FormDaOrganizacaoMixin, PapelRequeridoMixin, CreateView):
     model = Categoria
     form_class = CategoriaForm
     template_name = 'core/categoria_form.html'
     success_url = reverse_lazy('categoria_lista')
 
-class CategoriaUpdateView(FormDaOrganizacaoMixin, UpdateView):
+class CategoriaUpdateView(FormDaOrganizacaoMixin, PapelRequeridoMixin, UpdateView):
     model = Categoria
     form_class = CategoriaForm
     template_name = 'core/categoria_form.html'
     success_url = reverse_lazy('categoria_lista')
 
-class CategoriaDeleteView(DaOrganizacaoMixin, ExclusaoProtegidaMixin, DeleteView):
+class CategoriaDeleteView(DaOrganizacaoMixin, PapelRequeridoMixin, ExclusaoProtegidaMixin, DeleteView):
     model = Categoria
     template_name = 'core/confirm_delete.html'
     success_url = reverse_lazy('categoria_lista')
 
 
 # crud das prioridadas
-class PrioridadeListView(DaOrganizacaoMixin, ListView):
+class PrioridadeListView(DaOrganizacaoMixin, PapelRequeridoMixin, ListView):
     model = Prioridade
     template_name = 'core/prioridade_list.html'
     context_object_name = 'prioridades'
 
-class PrioridadeCreateView(FormDaOrganizacaoMixin, CreateView):
+class PrioridadeCreateView(FormDaOrganizacaoMixin, PapelRequeridoMixin, CreateView):
     model = Prioridade
     form_class = PrioridadeForm
     template_name = 'core/prioridade_form.html'
     success_url = reverse_lazy('prioridade_lista')
 
-class PrioridadeUpdateView(FormDaOrganizacaoMixin, UpdateView):
+class PrioridadeUpdateView(FormDaOrganizacaoMixin, PapelRequeridoMixin, UpdateView):
     model = Prioridade
     form_class = PrioridadeForm
     template_name = 'core/prioridade_form.html'
     success_url = reverse_lazy('prioridade_lista')
 
-class PrioridadeDeleteView(DaOrganizacaoMixin, ExclusaoProtegidaMixin, DeleteView):
+class PrioridadeDeleteView(DaOrganizacaoMixin, PapelRequeridoMixin, ExclusaoProtegidaMixin, DeleteView):
     model = Prioridade
     template_name = 'core/confirm_delete.html'
     success_url = reverse_lazy('prioridade_lista')
 
 
 #crud do SLA
-class SLAListView(DaOrganizacaoMixin, ListView):
+class SLAListView(DaOrganizacaoMixin, PapelRequeridoMixin, ListView):
     model = SLA
     template_name = 'core/sla_list.html'
     context_object_name = 'slas'
 
-class SLACreateView(FormDaOrganizacaoMixin, CreateView):
+class SLACreateView(FormDaOrganizacaoMixin, PapelRequeridoMixin, CreateView):
     model = SLA
     form_class = SLAForm
     template_name = 'core/sla_form.html'
     success_url = reverse_lazy('sla_lista')
 
-class SLAUpdateView(FormDaOrganizacaoMixin, UpdateView):
+class SLAUpdateView(FormDaOrganizacaoMixin, PapelRequeridoMixin, UpdateView):
     model = SLA
     form_class = SLAForm
     template_name = 'core/sla_form.html'
     success_url = reverse_lazy('sla_lista')
 
-class SLADeleteView(DaOrganizacaoMixin, DeleteView):
+class SLADeleteView(DaOrganizacaoMixin, PapelRequeridoMixin, DeleteView):
     model = SLA
     template_name = 'core/confirm_delete.html'
     success_url = reverse_lazy('sla_lista')
@@ -252,12 +251,12 @@ def dashboard(request):
     base, form = metricas_dashboard.filtrar_periodo(
         request, metricas_dashboard.base_do_dashboard(org_atual(request)),
     )
-    eh_admin = request.user.is_staff
-    contexto = metricas_dashboard.metricas(base, com_series=eh_admin)
+    admin = eh_admin(request.user)
+    contexto = metricas_dashboard.metricas(base, com_series=admin)
     contexto.update({
         'form': form,
-        'eh_admin': eh_admin,
-        'atrasados': metricas_dashboard.atrasados(base) if eh_admin else [],
+        'eh_admin': admin,
+        'atrasados': metricas_dashboard.atrasados(base) if admin else [],
     })
     return render(request, 'core/dashboard.html', contexto)
 
@@ -270,10 +269,8 @@ def _celula_segura(valor):
 
 
 @login_required
+@papel_requerido(Perfil.PAPEL_ADMIN)
 def exportar_csv(request):
-    if not request.user.is_staff:
-        raise PermissionDenied('Apenas administradores podem exportar o relatório.')
-
     base, _ = metricas_dashboard.filtrar_periodo(
         request, metricas_dashboard.base_do_dashboard(org_atual(request)),
     )
