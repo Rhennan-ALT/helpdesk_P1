@@ -1,0 +1,95 @@
+.tabela tr.sla td:first-child {
+    box-shadow: inset 4px 0 0 var(--cor-sla, transparent);
+}
+
+.sla-no_prazo  { --cor-sla: var(--sla-ok);       --cor-sla-fundo: var(--sla-ok-fundo); }
+.sla-em_risco  { --cor-sla: var(--sla-risco);    --cor-sla-fundo: var(--sla-risco-fundo); }
+.sla-atrasado  { --cor-sla: var(--sla-atrasado); --cor-sla-fundo: var(--sla-atrasado-fundo); }
+.sla-concluido { --cor-sla: var(--sla-fim);      --cor-sla-fundo: var(--sla-fim-fundo); }
+.sla-sem_prazo { --cor-sla: #CFCADB;             --cor-sla-fundo: var(--nevoa); }
+
+.prazo {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .2rem .6rem;
+    border-radius: 999px;
+    background-color: var(--cor-sla-fundo);
+    color: var(--cor-sla);
+    font-size: .8rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.prazo::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: currentColor;
+}
+
+.status {
+    display: inline-block;
+    padding: .15rem .55rem;
+    border-radius: 6px;
+    background-color: var(--nevoa);
+    border: 1px solid var(--linha);
+    font-size: .8rem;
+    white-space: nowrap;
+}
+
+.status-ANDAMENTO {
+    background-color: var(--ameixa-clara);
+    border-color: #DDD0E8;
+    color: var(--ameixa);
+}
+
+.status-FECHADO {
+    color: var(--texto-suave);
+}
+
+.sla-painel {
+    padding: 1.25rem 1.5rem;
+    border-left: 4px solid var(--cor-sla);
+}
+
+.sla-painel .rotulo {
+    font-size: .85rem;
+    color: var(--texto-suave);
+}
+
+.sla-painel .valor {
+    margin: .15rem 0 .9rem;
+    font-size: 1.35rem;
+    font-weight: 600;
+    color: var(--cor-sla);
+    letter-spacing: -.01em;
+}
+
+.sla-barra {
+    height: 8px;
+    border-radius: 999px;
+    background-color: var(--cor-sla-fundo);
+    overflow: hidden;
+}
+
+.sla-barra span {
+    display: block;
+    height: 100%;
+    border-radius: 999px;
+    background-color: var(--cor-sla);
+}
+
+.sla-marcos {
+    display: flex;
+    justify-content: space-between;
+    margin-top: .45rem;
+    font-size: .8rem;
+    color: var(--texto-suave);
+}
+
+.sla-sem_prazo .prazo,
+.prazo.sla-sem_prazo {
+    color: var(--texto-suave);
+}

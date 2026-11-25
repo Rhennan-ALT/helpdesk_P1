@@ -1,0 +1,77 @@
+.tabela {
+    width: 100%;
+    margin: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.tabela th {
+    padding: .65rem 1.25rem;
+    font-size: .8rem;
+    font-weight: 500;
+    color: var(--texto-suave);
+    background-color: #FAF9FC;
+    border-bottom: 1px solid var(--linha);
+    white-space: nowrap;
+}
+
+.tabela td {
+    padding: .85rem 1.25rem;
+    border-bottom: 1px solid var(--linha);
+    vertical-align: middle;
+}
+
+.tabela tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.tabela tbody tr:hover td {
+    background-color: #FAF9FC;
+}
+
+.tabela .acoes {
+    width: 1%;
+    white-space: nowrap;
+    text-align: right;
+}
+
+.tabela-rolagem {
+    overflow-x: auto;
+}
+
+.tabela a.titulo-chamado {
+    color: var(--texto);
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.tabela a.titulo-chamado:hover {
+    color: var(--ameixa);
+    text-decoration: underline;
+}
+
+.id-chamado {
+    color: var(--texto-suave);
+    font-size: .85rem;
+}
+
+.sub {
+    display: block;
+    color: var(--texto-suave);
+    font-size: .82rem;
+}
+
+.sub .num {
+    margin-right: .45rem;
+}
+
+@media (max-width: 575.98px) {
+    .tabela td,
+    .tabela th {
+        padding: .75rem .9rem;
+    }
+
+    .tabela .prazo {
+        white-space: normal;
+    }
+}

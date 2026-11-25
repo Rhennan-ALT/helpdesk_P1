@@ -1,25 +1,35 @@
 {% extends 'core/base.html' %}
 {% block title %}Prioridades{% endblock %}
+{% block page_title %}Prioridades{% endblock %}
+{% block page_subtitle %}<p>A ordem define qual prioridade aparece primeiro</p>{% endblock %}
+{% block page_actions %}
+    <a href="{% url 'prioridade_novo' %}" class="btn btn-primary"><i class="bi bi-plus-lg"></i><span class="rotulo">Nova prioridade</span></a>
+{% endblock %}
+
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h3>Prioridades</h3>
-    <a href="{% url 'prioridade_novo' %}" class="btn btn-primary">+ Nova Prioridade</a>
+<div class="superficie estreito">
+    <table class="tabela">
+        <thead><tr><th>Ordem</th><th>Nome</th><th class="acoes"><span class="visually-hidden">Ações</span></th></tr></thead>
+        <tbody>
+        {% for prioridade in prioridades %}
+            <tr>
+                <td class="num" style="width:5rem">{{ prioridade.ordem }}</td>
+                <td>{{ prioridade.nome }}</td>
+                <td class="acoes">
+                    <a href="{% url 'prioridade_editar' prioridade.pk %}" class="btn-icone" title="Editar" aria-label="Editar"><i class="bi bi-pencil"></i></a>
+                    <a href="{% url 'prioridade_excluir' prioridade.pk %}" class="btn-icone perigo" title="Excluir" aria-label="Excluir"><i class="bi bi-trash"></i></a>
+                </td>
+            </tr>
+        {% empty %}
+            <tr><td colspan="3">
+                <div class="vazio">
+                    <i class="bi bi-flag"></i>
+                    <p>Nenhuma prioridade cadastrada.</p>
+                    <a href="{% url 'prioridade_novo' %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i>Nova prioridade</a>
+                </div>
+            </td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
 </div>
-<table class="table table-hover">
-    <thead><tr><th>Nome</th><th>Ordem</th><th class="text-end">Ações</th></tr></thead>
-    <tbody>
-    {% for prioridade in prioridades %}
-        <tr>
-            <td>{{ prioridade.nome }}</td>
-            <td>{{ prioridade.ordem }}</td>
-            <td class="text-end">
-                <a href="{% url 'prioridade_editar' prioridade.pk %}" class="btn btn-sm btn-outline-primary">Editar</a>
-                <a href="{% url 'prioridade_excluir' prioridade.pk %}" class="btn btn-sm btn-outline-danger">Excluir</a>
-            </td>
-        </tr>
-    {% empty %}
-        <tr><td colspan="3" class="text-center text-muted py-4">Nenhuma prioridade cadastrada.</td></tr>
-    {% endfor %}
-    </tbody>
-</table>
 {% endblock %}

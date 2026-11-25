@@ -1,82 +1,67 @@
 {% extends 'core/base.html' %}
-{% block title %}Painel de Chamados{% endblock %}
+{% block title %}Chamados{% endblock %}
+{% block page_title %}Chamados{% endblock %}
+{% block page_subtitle %}<p>{% if user.perfil.eh_admin %}Todos os chamados da organização{% else %}Chamados que você abriu ou pelos quais é responsável{% endif %}</p>{% endblock %}
+{% block page_actions %}
+    <a href="{% url 'chamado_novo' %}" class="btn btn-primary"><i class="bi bi-plus-lg"></i><span class="rotulo">Novo chamado</span></a>
+{% endblock %}
+
 {% block content %}
-
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h3>Painel de Chamados</h3>
-    <a href="{% url 'chamado_novo' %}" class="btn btn-primary">+ Novo Chamado</a>
-</div>
-
-<form method="get" class="row g-2 mb-3 align-items-end">
-    <div class="col-auto">
-        <label class="form-label mb-0">Status</label>
-        <select name="status" class="form-select" onchange="this.form.submit()">
-            <option value="">Todos</option>
+<div class="superficie">
+    <form method="get" class="filtros">
+        <div class="campo-busca">
+            <i class="bi bi-search"></i>
+            <input type="search" name="q" class="form-control" value="{{ busca }}" placeholder="Buscar por título ou descrição" aria-label="Buscar">
+        </div>
+        <select name="status" class="form-select" onchange="this.form.submit()" aria-label="Status">
+            <option value="">Todos os status</option>
             {% for valor, rotulo in status_choices %}
                 <option value="{{ valor }}" {% if valor == status_selecionado %}selected{% endif %}>{{ rotulo }}</option>
             {% endfor %}
         </select>
-    </div>
-
-    <div class="col-auto">
-        <label class="form-label mb-0">Tipo</label>
-        <select name="tipo" class="form-select" onchange="this.form.submit()">
-            <option value="">Todos</option>
+        <select name="tipo" class="form-select" onchange="this.form.submit()" aria-label="Tipo">
+            <option value="">Todos os tipos</option>
             {% for valor, rotulo in tipo_choices %}
                 <option value="{{ valor }}" {% if valor == tipo_selecionado %}selected{% endif %}>{{ rotulo }}</option>
             {% endfor %}
         </select>
+        <div class="form-check m-0 ms-1">
+            <input class="form-check-input" type="checkbox" name="atrasados" value="1" id="atrasados"
+                   {% if apenas_atrasados %}checked{% endif %} onchange="this.form.submit()">
+            <label class="form-check-label" for="atrasados">Só atrasados</label>
+        </div>
+    </form>
+
+    <div class="tabela-rolagem">
+        <table class="tabela">
+            <thead>
+                <tr>
+                    <th>Chamado</th>
+                    <th class="d-none d-md-table-cell">Equipe</th>
+                    <th class="d-none d-md-table-cell">Prioridade</th>
+                    <th class="d-none d-sm-table-cell">Status</th>
+                    <th>Prazo</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for chamado in chamados %}
+                {% include 'core/_linha_chamado.html' %}
+            {% empty %}
+                <tr><td colspan="5">
+                    <div class="vazio">
+                        <i class="bi bi-inbox"></i>
+                        {% if busca or status_selecionado or tipo_selecionado or apenas_atrasados %}
+                            <p>Nenhum chamado com esses filtros.</p>
+                            <a href="{% url 'painel' %}" class="btn btn-secundario btn-sm">Limpar filtros</a>
+                        {% else %}
+                            <p>Nenhum chamado por aqui ainda.</p>
+                            <a href="{% url 'chamado_novo' %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i>Abrir o primeiro chamado</a>
+                        {% endif %}
+                    </div>
+                </td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
     </div>
-
-    <div class="col-auto form-check ms-2 mb-2">
-        <input class="form-check-input" type="checkbox" name="atrasados" value="1" id="atrasados"
-               {% if apenas_atrasados %}checked{% endif %} onchange="this.form.submit()">
-        <label class="form-check-label" for="atrasados">Somente atrasados</label>
-    </div>
-
-    <input type="text" name="q" class="form-control" value="{{ busca }}" placeholder="Buscar">
-</form>
-
-<table class="table table-hover">
-    <thead>
-        <tr>
-            <th>#</th>
-            <th>Título</th>
-            <th>Equipe</th>
-            <th>Prioridade</th>
-            <th>Status</th>
-            <th>Prazo (SLA)</th>
-            <th>Situação</th>
-        </tr>
-    </thead>
-    <tbody>
-    {% for chamado in chamados %}
-        <tr>
-            <td><a href="{% url 'chamado_detalhe' chamado.pk %}">#{{ chamado.pk }}</a></td>
-            <td><a href="{% url 'chamado_detalhe' chamado.pk %}">{{ chamado.titulo }}</a></td>
-            <td>{{ chamado.equipe }}</td>
-            <td>{{ chamado.prioridade }}</td>
-            <td>{{ chamado.get_status_display }}</td>
-            <td>
-                {% if chamado.data_limite %}
-                    {{ chamado.data_limite|date:"d/m/Y H:i" }}
-                {% else %}
-                    <span class="text-muted">SLA não cadastrado</span>
-                {% endif %}
-            </td>
-            <td>
-                {% if chamado.status == 'FECHADO' %}
-                    <span class="badge bg-secondary">Concluído</span>
-                {% elif chamado.esta_atrasado %}
-                    <span class="badge badge-atrasado">Atrasado</span>
-                {% else %}
-                    <span class="badge badge-no-prazo">Dentro do prazo</span>
-                {% endif %}
-            </td>
-        </tr>
-    {% empty %}
-        <tr><td colspan="7" class="text-center text-muted py-4">Nenhum chamado encontrado.</td></tr>
-    {% endfor %}
-    </tbody>
-</table>
+</div>
 {% endblock %}

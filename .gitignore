@@ -4,3 +4,9 @@ db.sqlite3
 .venv/
 venv/
 *.sqlite3
+# Segredos / variáveis de ambiente
+.env
+
+# Backups da migração SQLite -> PostgreSQL
+*.bak
+backup_*.json

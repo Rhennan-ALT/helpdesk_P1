@@ -1,0 +1,115 @@
+.auth {
+    display: grid;
+    grid-template-columns: minmax(320px, 5fr) 7fr;
+    min-height: 100vh;
+}
+
+.auth-lado {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 2.5rem;
+    background-color: var(--noite);
+    color: var(--noite-texto);
+}
+
+.auth-lado h2 {
+    max-width: 18ch;
+    margin: 0 0 1rem;
+    color: #FFFFFF;
+    font-size: 2rem;
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -.02em;
+}
+
+.auth-lado p {
+    max-width: 40ch;
+    margin: 0;
+}
+
+.auth-exemplo {
+    display: grid;
+    gap: .5rem;
+    max-width: 340px;
+}
+
+.auth-exemplo div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: .65rem .85rem;
+    border-radius: var(--raio-controle);
+    background-color: var(--noite-2);
+    color: #FFFFFF;
+    font-size: .85rem;
+}
+
+.auth-form {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2.5rem 1.5rem;
+}
+
+.auth-caixa {
+    width: 100%;
+    max-width: 380px;
+}
+
+.auth-caixa h1 {
+    margin: 0 0 .35rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: -.015em;
+}
+
+.auth-caixa .intro {
+    margin-bottom: 1.75rem;
+    color: var(--texto-suave);
+}
+
+.auth-caixa input:not([type=checkbox]) {
+    display: block;
+    width: 100%;
+    padding: .55rem .75rem;
+    border: 1px solid var(--linha);
+    border-radius: var(--raio-controle);
+    background-color: var(--superficie);
+    font-size: .95rem;
+}
+
+.auth-caixa input:focus {
+    outline: none;
+    border-color: var(--ameixa);
+    box-shadow: 0 0 0 3px rgba(75, 42, 99, .15);
+}
+
+.auth-caixa .helptext,
+.auth-caixa .form-text ul {
+    color: var(--texto-suave);
+    font-size: .8rem;
+}
+
+.auth-troca {
+    margin-top: 1.5rem;
+    text-align: center;
+    color: var(--texto-suave);
+    font-size: .9rem;
+}
+
+@media (max-width: 767.98px) {
+    .auth {
+        grid-template-columns: 1fr;
+    }
+
+    .auth-lado {
+        padding: 1.5rem;
+    }
+
+    .auth-lado h2,
+    .auth-exemplo {
+        display: none;
+    }
+}

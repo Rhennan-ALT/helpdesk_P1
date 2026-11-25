@@ -1,26 +1,36 @@
 {% extends 'core/base.html' %}
 {% block title %}SLAs{% endblock %}
+{% block page_title %}SLAs{% endblock %}
+{% block page_subtitle %}<p>Prazo de atendimento para cada categoria e prioridade</p>{% endblock %}
+{% block page_actions %}
+    <a href="{% url 'sla_novo' %}" class="btn btn-primary"><i class="bi bi-plus-lg"></i><span class="rotulo">Novo SLA</span></a>
+{% endblock %}
+
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h3>SLAs (Categoria x Prioridade)</h3>
-    <a href="{% url 'sla_novo' %}" class="btn btn-primary">+ Novo SLA</a>
+<div class="superficie estreito">
+    <table class="tabela">
+        <thead><tr><th>Categoria</th><th>Prioridade</th><th>Prazo</th><th class="acoes"><span class="visually-hidden">Ações</span></th></tr></thead>
+        <tbody>
+        {% for sla in slas %}
+            <tr>
+                <td>{{ sla.categoria }}</td>
+                <td>{{ sla.prioridade }}</td>
+                <td class="num">{{ sla.horas }} h</td>
+                <td class="acoes">
+                    <a href="{% url 'sla_editar' sla.pk %}" class="btn-icone" title="Editar" aria-label="Editar"><i class="bi bi-pencil"></i></a>
+                    <a href="{% url 'sla_excluir' sla.pk %}" class="btn-icone perigo" title="Excluir" aria-label="Excluir"><i class="bi bi-trash"></i></a>
+                </td>
+            </tr>
+        {% empty %}
+            <tr><td colspan="4">
+                <div class="vazio">
+                    <i class="bi bi-stopwatch"></i>
+                    <p>Nenhum SLA cadastrado. Sem SLA, os chamados ficam sem prazo.</p>
+                    <a href="{% url 'sla_novo' %}" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg"></i>Novo SLA</a>
+                </div>
+            </td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
 </div>
-<table class="table table-hover">
-    <thead><tr><th>Categoria</th><th>Prioridade</th><th>Horas para atendimento</th><th class="text-end">Ações</th></tr></thead>
-    <tbody>
-    {% for sla in slas %}
-        <tr>
-            <td>{{ sla.categoria }}</td>
-            <td>{{ sla.prioridade }}</td>
-            <td>{{ sla.horas }}h</td>
-            <td class="text-end">
-                <a href="{% url 'sla_editar' sla.pk %}" class="btn btn-sm btn-outline-primary">Editar</a>
-                <a href="{% url 'sla_excluir' sla.pk %}" class="btn btn-sm btn-outline-danger">Excluir</a>
-            </td>
-        </tr>
-    {% empty %}
-        <tr><td colspan="4" class="text-center text-muted py-4">Nenhum SLA cadastrado.</td></tr>
-    {% endfor %}
-    </tbody>
-</table>
 {% endblock %}

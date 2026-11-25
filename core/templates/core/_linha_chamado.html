@@ -1,0 +1,13 @@
+<tr class="sla sla-{{ chamado.situacao_sla }}">
+    <td>
+        <a class="titulo-chamado" href="{% url 'chamado_detalhe' chamado.pk %}">{{ chamado.titulo }}</a>
+        <span class="sub"><span class="num">#{{ chamado.pk }}</span> {{ chamado.get_tipo_display }}</span>
+    </td>
+    <td class="d-none d-md-table-cell">{{ chamado.equipe }}</td>
+    <td class="d-none d-md-table-cell">{{ chamado.prioridade }}</td>
+    <td class="d-none d-sm-table-cell"><span class="status status-{{ chamado.status }}">{{ chamado.get_status_display }}</span></td>
+    <td>
+        {% include 'core/_prazo.html' %}
+        {% if chamado.data_limite and chamado.status != 'FECHADO' %}<span class="sub num">{{ chamado.data_limite|date:"d/m H:i" }}</span>{% endif %}
+    </td>
+</tr>

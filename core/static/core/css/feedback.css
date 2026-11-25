@@ -1,0 +1,55 @@
+.aviso {
+    display: flex;
+    align-items: flex-start;
+    gap: .6rem;
+    padding: .8rem 1rem;
+    margin-bottom: 1.25rem;
+    border-radius: var(--raio-controle);
+    border: 1px solid var(--linha);
+    background-color: var(--superficie);
+    font-size: .9rem;
+}
+
+.aviso .btn-close {
+    margin-left: auto;
+    font-size: .7rem;
+}
+
+.aviso-success { border-color: #BFDDD2; background-color: var(--sla-ok-fundo); color: #1F5543; }
+.aviso-danger,
+.aviso-error   { border-color: #EBC3CF; background-color: var(--sla-atrasado-fundo); color: #7A1F3D; }
+.aviso-warning { border-color: #EED7AE; background-color: var(--sla-risco-fundo); color: #7A4A00; }
+.aviso-info    { border-color: #DDD0E8; background-color: var(--ameixa-clara); color: var(--ameixa); }
+
+.vazio {
+    padding: 3rem 1.5rem;
+    text-align: center;
+    color: var(--texto-suave);
+}
+
+.vazio i {
+    display: block;
+    margin-bottom: .5rem;
+    font-size: 1.8rem;
+    color: #B7B0C6;
+}
+
+.vazio p {
+    margin: 0 0 1rem;
+}
+
+.confirmacao {
+    max-width: 520px;
+}
+
+.confirmacao .icone {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    margin-bottom: 1rem;
+    border-radius: 10px;
+    background-color: var(--sla-atrasado-fundo);
+    color: var(--sla-atrasado);
+    font-size: 1.3rem;
+}
