@@ -84,3 +84,19 @@ class CadastroUsuarioForm(_BootstrapFormMixin, UserCreationForm):
 
 class LoginForm(_BootstrapFormMixin, AuthenticationForm):
     pass
+
+class PeriodoForm(_BootstrapFormMixin, forms.Form):
+    inicio = forms.DateField(
+        label='De', required=False, widget=forms.DateInput(attrs={'type': 'date'}),
+    )
+    fim = forms.DateField(
+        label='Até', required=False, widget=forms.DateInput(attrs={'type': 'date'}),
+    )
+
+    def clean(self):
+        dados = super().clean()
+        inicio, fim = dados.get('inicio'), dados.get('fim')
+        if inicio and fim and inicio > fim:
+            raise forms.ValidationError('A data inicial não pode ser depois da data final.')
+        return dados
+
