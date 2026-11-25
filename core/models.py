@@ -188,6 +188,9 @@ class Chamado(DaOrganizacao):
         verbose_name = 'Chamado'
         verbose_name_plural = 'Chamados'
         ordering = ['-data_criacao']
+        indexes = [
+            models.Index(fields=['organizacao', 'data_criacao'], name='chamado_org_criacao_idx'),
+        ]
 
     def __str__(self):
         return f'#{self.pk} - {self.titulo}'
