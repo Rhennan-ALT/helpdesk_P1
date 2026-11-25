@@ -12,8 +12,8 @@ class OrganizacaoAdmin(admin.ModelAdmin):
 
 @admin.register(Perfil)
 class PerfilAdmin(admin.ModelAdmin):
-    list_display = ('usuario', 'organizacao')
-    list_filter = ('organizacao',)
+    list_display = ('usuario', 'organizacao', 'papel')
+    list_filter = ('organizacao', 'papel')
     search_fields = ('usuario__username',)
 
 class PerfilInline(admin.StackedInline):
@@ -25,13 +25,18 @@ admin.site.unregister(User)
 @admin.register(User)
 class UsuarioAdmin(UserAdmin):
     inlines = [PerfilInline]
-    list_display = ('username', 'email', 'organizacao', 'is_staff')
-    list_filter = ('perfil__organizacao', 'is_staff', 'is_superuser')
+    list_display = ('username', 'email', 'organizacao', 'papel', 'is_staff')
+    list_filter = ('perfil__organizacao', 'perfil__papel', 'is_staff', 'is_superuser')
 
     @admin.display(description='Organização')
     def organizacao(self, obj):
         perfil = getattr(obj, 'perfil', None)
         return perfil.organizacao if perfil else '-'
+
+    @admin.display(description='Papel')
+    def papel(self, obj):
+        perfil = getattr(obj, 'perfil', None)
+        return perfil.get_papel_display() if perfil else '-'
 
 @admin.register(Equipe)
 class EquipeAdmin(admin.ModelAdmin):
