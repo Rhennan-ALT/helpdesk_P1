@@ -1,22 +1,21 @@
-{% extends 'core/base.html' %}
-{% block title %}Cadastro{% endblock %}
+{% extends 'core/base_auth.html' %}
+{% block title %}Criar organização{% endblock %}
 {% block content %}
-<div class="card-auth mt-2">
-    <h3 class="mb-3">Criar conta</h3>
-    <form method="post">
-        {% csrf_token %}
-        {% for field in form %}
-            <div class="mb-3">
-                <label class="form-label">{{ field.label }}</label>
-                {{ field }}
-                {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
-                {% if field.errors %}<div class="text-danger small">{{ field.errors }}</div>{% endif %}
-            </div>
-        {% endfor %}
-        <button type="submit" class="btn btn-primary w-100">Cadastrar</button>
-    </form>
-    <p class="text-center mt-3 mb-0">
-        Já tem conta? <a href="{% url 'login' %}">Entrar</a>
-    </p>
-</div>
+<h1>Criar organização</h1>
+<p class="intro">Você será o administrador. Equipes, categorias, prioridades e SLAs iniciais já vêm prontos.</p>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+    {% for field in form %}
+        <div class="mb-3">
+            <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.name == 'password1' and field.help_text %}<div class="form-text">{{ field.help_text|safe }}</div>{% endif %}
+            {% if field.errors %}<div class="erro-campo">{{ field.errors }}</div>{% endif %}
+        </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-primary w-100 justify-content-center mt-2">Criar organização</button>
+</form>
+
+<p class="auth-troca">Já tem conta? <a href="{% url 'login' %}">Entrar</a></p>
 {% endblock %}

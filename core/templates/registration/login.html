@@ -1,24 +1,25 @@
-{% extends 'core/base.html' %}
+{% extends 'core/base_auth.html' %}
 {% block title %}Entrar{% endblock %}
 {% block content %}
-<div class="card-auth mt-2">
-            <h3 class="mb-3">Entrar</h3>
-            <form method="post">
-                {% csrf_token %}
-                {% for field in form %}
-                    <div class="mb-3">
-                        <label class="form-label">{{ field.label }}</label>
-                        {{ field }}
-                        {% if field.errors %}<div class="text-danger small">{{ field.errors }}</div>{% endif %}
-                    </div>
-                {% endfor %}
-                {% if form.non_field_errors %}
-                    <div class="text-danger small mb-2">{{ form.non_field_errors }}</div>
-                {% endif %}
-                <button type="submit" class="btn btn-primary w-100">Entrar</button>
-            </form>
-            <p class="text-center mt-3 mb-0">
-                Não tem conta? <a href="{% url 'cadastro' %}">Cadastre-se</a>
-            </p>
-</div>
+<h1>Entrar</h1>
+<p class="intro">Use o usuário e a senha da sua organização.</p>
+
+{% if form.non_field_errors %}
+    <div class="aviso aviso-danger">Usuário ou senha incorretos. Confira os dados e tente de novo.</div>
+{% endif %}
+
+<form method="post" novalidate>
+    {% csrf_token %}
+    {% for field in form %}
+        <div class="mb-3">
+            <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.errors %}<div class="erro-campo">{{ field.errors }}</div>{% endif %}
+        </div>
+    {% endfor %}
+    <input type="hidden" name="next" value="{{ next }}">
+    <button type="submit" class="btn btn-primary w-100 justify-content-center mt-2">Entrar</button>
+</form>
+
+<p class="auth-troca">Ainda não usa o Help Desk? <a href="{% url 'cadastro' %}">Criar uma organização</a></p>
 {% endblock %}
