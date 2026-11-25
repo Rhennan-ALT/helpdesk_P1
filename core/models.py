@@ -18,19 +18,31 @@ class Organizacao(models.Model):
 
 
 class Perfil(models.Model):
+    PAPEL_ADMIN = 'admin'
+    PAPEL_OPERADOR = 'operador'
+    PAPEIS = [
+        (PAPEL_ADMIN, 'Administrador'),
+        (PAPEL_OPERADOR, 'Operador'),
+    ]
+
     usuario = models.OneToOneField(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name='Usuário',
     )
     organizacao = models.ForeignKey(
         Organizacao, on_delete=models.PROTECT, related_name='perfis', verbose_name='Organização',
     )
+    papel = models.CharField('Papel', max_length=20, choices=PAPEIS, default=PAPEL_OPERADOR)
 
     class Meta:
         verbose_name = 'Perfil'
         verbose_name_plural = 'Perfis'
 
     def __str__(self):
-        return f'{self.usuario} ({self.organizacao})'
+        return f'{self.usuario} ({self.organizacao} - {self.get_papel_display()})'
+
+    @property
+    def eh_admin(self):
+        return self.papel == self.PAPEL_ADMIN
 
 
 class DaOrganizacao(models.Model):
@@ -253,7 +265,7 @@ class Chamado(DaOrganizacao):
         return timezone.now() > self.data_limite
 
     def usuario_pode_gerenciar(self, user):
-
-        if user.is_staff:
+        perfil = getattr(user, 'perfil', None)
+        if perfil is not None and perfil.eh_admin:
             return True
         return user in (self.solicitante, self.responsavel)
